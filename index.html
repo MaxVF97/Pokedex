@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
+</head>
+<body>
+    <h1>Pokedex</h1>
+    <input type="text" id="pokemon-input" placeholder="Ingresa el nombre o ID del Pokémon">
+    <button id="btn-buscar">Buscar</button>
+    <div id="resultado">
+    </div>
+    <script>
+       const input = document.getElementById('pokemon-input');
+       const button = document.getElementById('btn-buscar');
+       const resultado = document.getElementById('resultado');
+
+       const tiposEnEspanol = {
+        normal: "Normal",
+        fire: "Fuego",
+        water: "Agua",
+        electric: "Eléctrico",
+        grass: "Planta",
+        ice: "Hielo",
+        fighting: "Lucha",
+        poison: "Veneno",
+        ground: "Tierra",
+        flying: "Volador",
+        psychic: "Psíquico",
+        bug: "Bicho",
+        rock: "Roca",
+        ghost: "Fantasma",
+        dragon: "Dragón",
+        dark: "Siniestro",
+        steel: "Acero",
+        fairy: "Hada"
+       };
+
+       async function buscarPokemon() {
+        const pokemonName = input.value;
+        resultado.innerHTML = "<p>Buscando...</p>";
+        try{
+        const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+        const data = await respuesta.json();
+
+        // Segunda petición: la info de "especie" trae si es legendario o no
+        const respuestaEspecie = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`);
+        const dataEspecie = await respuestaEspecie.json();
+        const mensajeLegendario = dataEspecie.is_legendary ? "<p>⭐ ¡Pokémon legendario! ⭐</p>" : "";
+
+        const spriteAnimado = data.sprites.versions["generation-v"]["black-white"].animated.front_default;
+        const imagenFinal = spriteAnimado ? spriteAnimado : data.sprites.front_default;
+
+        // Recorremos TODOS los tipos (1 o 2), no solo el primero
+        let tiposFinal = "";
+        data.types.forEach(function(tipoObj) {
+          const nombreIngles = tipoObj.type.name;
+          const nombreEspanol = tiposEnEspanol[nombreIngles] ? tiposEnEspanol[nombreIngles] : nombreIngles;
+          tiposFinal += nombreEspanol + " ";
+        });
+
+        // Nombre con primera letra en mayúscula
+        const nombreCapitalizado = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+
+        resultado.innerHTML = "<h2>" + nombreCapitalizado + "</h2>" + "<img src='" +
+        imagenFinal + "' alt='" + data.name + "'>"
+        + "<p>Altura: " + (data.height / 10) + " m</p>" + "<p>Peso: " + (data.weight / 10) + " kg</p>"
+         + "<p>Tipo: " + tiposFinal + "</p>" + mensajeLegendario;
+        input.value = ""; 
+    } catch(error){
+        resultado.innerHTML = "<p>Pokémon no encontrado.</p>";
+    }
+       }
+       button.addEventListener('click', buscarPokemon);
+       input.addEventListener("keydown" , function(event) {
+        if (event.key === "Enter") {
+            buscarPokemon();
+        }
+         });
+    </script>
+</body>
+</html>
