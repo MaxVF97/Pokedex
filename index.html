@@ -6,15 +6,482 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rojo: #cc0000;
+            --rojo-oscuro: #8f0000;
+            --blanco: #ffffff;
+            --crema: #fff8f0;
+            --negro: #222222;
+            --amarillo: #ffcb05;
+            --turquesa: #1ecfd4;
+            --azul-pokemon: #2450a4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Baloo 2', 'Segoe UI', Arial, sans-serif;
+            background-color: var(--crema);
+            color: var(--negro);
+            position: relative;
+            overflow-x: hidden;
+            padding: 30px 15px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .icono-flotante {
+            position: absolute;
+            opacity: 0.07;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Encabezado tipo Pokédex --- */
+        .encabezado {
+            width: 100%;
+            max-width: 900px;
+            background: linear-gradient(180deg, var(--rojo) 0%, var(--rojo-oscuro) 100%);
+            border-radius: 16px 16px 40px 16px;
+            padding: 20px 25px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 25px;
+            border: 3px solid var(--negro);
+        }
+
+        .luces-pokedex {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .lente-pokedex {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #ffffff, var(--turquesa) 45%, #0a7a80 100%);
+            border: 4px solid var(--blanco);
+            box-shadow: 0 0 0 3px var(--negro), 0 3px 8px rgba(0, 0, 0, 0.4);
+            animation: parpadeo 1.6s ease-in-out infinite;
+        }
+
+        @keyframes parpadeo {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(0.55);
+            }
+        }
+
+        .luz {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--negro);
+        }
+
+        .luz-roja {
+            background-color: #ff3b3b;
+            box-shadow: 0 0 8px 2px #ff3b3b;
+        }
+
+        .luz-amarilla {
+            background-color: var(--amarillo);
+            box-shadow: 0 0 8px 2px var(--amarillo);
+        }
+
+        .luz-verde {
+            background-color: #4fd66b;
+            box-shadow: 0 0 8px 2px #4fd66b;
+        }
+
+        /* --- Título estilo logo Pokémon: amarillo con contorno azul grueso --- */
+        h1 {
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            color: var(--amarillo);
+            text-align: center;
+            margin: 5px 0 18px 0;
+            font-size: 68px;
+            letter-spacing: 1px;
+            -webkit-text-stroke: 4px var(--azul-pokemon);
+            text-shadow:
+                4px 4px 0 var(--azul-pokemon),
+                7px 7px 0 #1a3a7a;
+            line-height: 1;
+        }
+
+        .fila-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        #pokemon-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border-radius: 30px;
+            border: none;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        #btn-buscar,
+        #btn-random {
+            padding: 12px 22px;
+            border-radius: 30px;
+            border: 2px solid var(--negro);
+            background-color: var(--blanco);
+            color: var(--rojo);
+            font-weight: 700;
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        #btn-buscar:hover,
+        #btn-random:hover {
+            background-color: var(--amarillo);
+            transform: translateY(-1px);
+        }
+
+        .signo-interrogacion {
+            color: var(--amarillo);
+            -webkit-text-stroke: 1px var(--negro);
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        /* --- Tarjeta principal, con color dinámico según el tipo principal --- */
+        .tarjeta {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--blanco);
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border: 3px solid var(--color-tipo, var(--rojo));
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .tarjeta>div {
+            padding: 20px;
+        }
+
+        .seccion-info {
+            border-right: 2px dashed #ecd6d6;
+        }
+
+        .seccion-debilidades {
+            border-right: 2px dashed #ecd6d6;
+        }
+
+        .tarjeta h2 {
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            margin: 0 0 12px 0;
+            color: var(--color-tipo, var(--rojo-oscuro));
+            text-align: center;
+            font-size: 26px;
+        }
+
+        .tarjeta h3,
+        .tarjeta h4 {
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            color: var(--blanco);
+            background-color: var(--color-tipo, var(--rojo));
+            padding: 7px 12px;
+            border-radius: 8px;
+            margin: 0 0 14px 0;
+            text-align: center;
+        }
+
+        .seccion-info img:first-of-type {
+            display: block;
+            margin: 0 auto 12px;
+            max-width: 130px;
+            image-rendering: pixelated;
+        }
+
+        /* --- Chips de altura/peso --- */
+        .estadisticas {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .chip-estadistica {
+            background-color: var(--crema);
+            border: 1.5px solid var(--color-tipo, var(--rojo));
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* --- Insignias de tipo / debilidad: ícono arriba, nombre abajo --- */
+        .fila-insignias {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .insignia {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 58px;
+        }
+
+        .insignia .icono-tipo {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+        }
+
+        .insignia span {
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .bloque-debilidad-tipo {
+            margin-bottom: 14px;
+        }
+
+        .bloque-debilidad-tipo strong {
+            display: block;
+            text-align: center;
+            color: var(--color-tipo, var(--rojo-oscuro));
+            margin-bottom: 6px;
+        }
+
+        .seccion-movimientos {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lista-movimientos {
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .lista-movimientos p {
+            margin: 4px 0;
+            padding: 6px 10px;
+            background-color: var(--crema);
+            border-left: 3px solid var(--color-tipo, var(--rojo));
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .lista-movimientos::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .lista-movimientos::-webkit-scrollbar-thumb {
+            background-color: var(--color-tipo, var(--rojo));
+            border-radius: 10px;
+        }
+
+        .fila-botones {
+            grid-column: 1 / -1;
+            background-color: var(--crema);
+            border-top: 2px solid var(--color-tipo, var(--rojo));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .fila-botones button {
+            padding: 14px 22px;
+            min-width: 130px;
+            border-radius: 12px;
+            border: none;
+            background-color: var(--color-tipo, var(--rojo));
+            color: var(--blanco);
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .fila-botones button:hover {
+            filter: brightness(0.85);
+            transform: translateY(-2px);
+        }
+
+        .fila-botones .btn-grito {
+            background-color: var(--negro);
+        }
+
+        @media (max-width: 750px) {
+            .tarjeta {
+                grid-template-columns: 1fr;
+            }
+
+            .seccion-info,
+            .seccion-debilidades {
+                border-right: none;
+                border-bottom: 2px dashed #ecd6d6;
+            }
+
+            .icono-flotante {
+                display: none;
+            }
+
+            h1 {
+                font-size: 40px;
+                -webkit-text-stroke: 2.5px var(--azul-pokemon);
+                text-shadow: 2.5px 2.5px 0 var(--azul-pokemon), 4px 4px 0 #1a3a7a;
+            }
+
+            .lente-pokedex {
+                width: 44px;
+                height: 44px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Pokedex</h1>
-    <input type="text" id="pokemon-input" placeholder="Ingresa el nombre o ID del Pokémon">
-    <button id="btn-buscar">Buscar</button>
-    <button id="btn-random">Aleatorio 🎲</button>
+
+    <svg class="icono-flotante" style="top: 3%; left: 2%;" width="55" height="55" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#cc0000" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#cc0000" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#cc0000" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="top: 2%; right: 3%;" width="45" height="45" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#222" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="top: 10%; left: 30%;" width="30" height="30" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#cc0000" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#cc0000" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#cc0000" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="top: 8%; right: 25%;" width="34" height="34" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#222" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="top: 22%; left: 6%;" width="48" height="48" viewBox="0 0 60 60">
+        <circle cx="12" cy="14" r="6" fill="#cc0000" />
+        <circle cx="48" cy="14" r="6" fill="#cc0000" />
+        <circle cx="30" cy="35" r="22" fill="#cc0000" />
+        <circle cx="23" cy="32" r="3" fill="#fff8f0" />
+        <circle cx="37" cy="32" r="3" fill="#fff8f0" />
+    </svg>
+    <svg class="icono-flotante" style="top: 20%; right: 8%;" width="50" height="50" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#cc0000" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#cc0000" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#cc0000" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="top: 32%; right: 8%;" width="46" height="46" viewBox="0 0 60 60">
+        <circle cx="26" cy="30" r="20" fill="#222" />
+        <path d="M44 30 L58 18 L54 34 Z" fill="#222" />
+        <circle cx="20" cy="27" r="3" fill="#fff8f0" />
+        <circle cx="32" cy="27" r="3" fill="#fff8f0" />
+    </svg>
+    <svg class="icono-flotante" style="top: 45%; left: 3%;" width="42" height="42" viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="24" fill="#cc0000" />
+        <circle cx="21" cy="26" r="3.5" fill="#fff8f0" />
+        <circle cx="39" cy="26" r="3.5" fill="#fff8f0" />
+        <path d="M20 38 Q30 44 40 38" stroke="#fff8f0" stroke-width="3" fill="none" stroke-linecap="round" />
+    </svg>
+    <svg class="icono-flotante" style="top: 50%; right: 4%;" width="44" height="44" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#cc0000" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#cc0000" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#cc0000" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="top: 60%; left: 16%;" width="26" height="26" viewBox="0 0 34 34">
+        <circle cx="17" cy="17" r="15" fill="none" stroke="#cc0000" stroke-width="2.5" />
+        <circle cx="17" cy="17" r="4" fill="#cc0000" />
+    </svg>
+    <svg class="icono-flotante" style="top: 65%; right: 20%;" width="44" height="44" viewBox="0 0 60 60">
+        <path d="M10 20 L18 5 L22 22 Z" fill="#222" />
+        <path d="M50 20 L42 5 L38 22 Z" fill="#222" />
+        <circle cx="30" cy="34" r="20" fill="#222" />
+        <circle cx="24" cy="32" r="3" fill="#fff8f0" />
+        <circle cx="36" cy="32" r="3" fill="#fff8f0" />
+    </svg>
+    <svg class="icono-flotante" style="bottom: 6%; left: 5%;" width="55" height="55" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#222" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
+    </svg>
+    <svg class="icono-flotante" style="bottom: 10%; right: 6%;" width="42" height="42" viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="24" fill="#cc0000" />
+        <circle cx="21" cy="26" r="3.5" fill="#fff8f0" />
+        <circle cx="39" cy="26" r="3.5" fill="#fff8f0" />
+        <path d="M20 38 Q30 44 40 38" stroke="#fff8f0" stroke-width="3" fill="none" stroke-linecap="round" />
+    </svg>
+    <svg class="icono-flotante" style="bottom: 4%; left: 25%;" width="26" height="26" viewBox="0 0 34 34">
+        <path d="M17 2 L21 13 L32 13 L23 20 L27 31 L17 24 L7 31 L11 20 L2 13 L13 13 Z" fill="#cc0000" />
+    </svg>
+    <svg class="icono-flotante" style="bottom: 15%; right: 28%;" width="30" height="30" viewBox="0 0 34 34">
+        <circle cx="17" cy="17" r="15" fill="none" stroke="#222" stroke-width="2.5" />
+        <circle cx="17" cy="17" r="4" fill="#222" />
+    </svg>
+    <svg class="icono-flotante" style="bottom: 2%; right: 15%;" width="40" height="40" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="30" fill="none" stroke="#222" stroke-width="4" />
+        <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
+        <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
+    </svg>
+
+    <div class="encabezado">
+        <div class="luces-pokedex">
+            <div class="lente-pokedex"></div>
+            <div class="luz luz-roja"></div>
+            <div class="luz luz-amarilla"></div>
+            <div class="luz luz-verde"></div>
+        </div>
+        <h1>Pokedex</h1>
+        <div class="fila-input">
+            <input type="text" id="pokemon-input" placeholder="Ingresa el nombre o ID del Pokémon">
+            <button id="btn-buscar">Buscar</button>
+            <button id="btn-random"><span class="signo-interrogacion">?</span> Aleatorio</button>
+        </div>
+    </div>
+
     <div id="resultado">
     </div>
+
     <script>
         // Obtener referencias a los elementos del DOM
         const input = document.getElementById('pokemon-input');
@@ -26,48 +493,77 @@
 
         // Diccionario para traducir los tipos de Pokémon al español
         const tiposEnEspanol = {
-            normal: "Normal",
-            fire: "Fuego",
-            water: "Agua",
-            electric: "Eléctrico",
-            grass: "Planta",
-            ice: "Hielo",
-            fighting: "Lucha",
-            poison: "Veneno",
-            ground: "Tierra",
-            flying: "Volador",
-            psychic: "Psíquico",
-            bug: "Bicho",
-            rock: "Roca",
-            ghost: "Fantasma",
-            dragon: "Dragón",
-            dark: "Siniestro",
-            steel: "Acero",
-            fairy: "Hada"
+            normal: "Normal", fire: "Fuego", water: "Agua", electric: "Eléctrico",
+            grass: "Planta", ice: "Hielo", fighting: "Lucha", poison: "Veneno",
+            ground: "Tierra", flying: "Volador", psychic: "Psíquico", bug: "Bicho",
+            rock: "Roca", ghost: "Fantasma", dragon: "Dragón", dark: "Siniestro",
+            steel: "Acero", fairy: "Hada"
         };
+
+        // Diccionario de colores base por tipo, para pintar la tarjeta dinámicamente
+        const coloresPorTipo = {
+            normal: "#a8a878", fire: "#e8620f", water: "#4287f5", electric: "#e8c000",
+            grass: "#4caf50", ice: "#5cd0d0", fighting: "#c03028", poison: "#a040a0",
+            ground: "#d9a441", flying: "#8f7dea", psychic: "#f85888", bug: "#8fa021",
+            rock: "#b8a038", ghost: "#6a5698", dragon: "#5537d6", dark: "#5b4a3f",
+            steel: "#7d7d99", fairy: "#e57ea0"
+        };
+
+        // Función para buscar un Pokémon en la cadena de evolución
+        function buscarEnCadena(nodo, nombreBuscado) {
+            if (nodo.species.name === nombreBuscado) {
+                return nodo;
+            }
+            for (const hijo of nodo.evolves_to) {
+                const encontrado = buscarEnCadena(hijo, nombreBuscado);
+                if (encontrado) {
+                    return encontrado;
+                }
+            }
+            return null;
+        }
 
         // Función para buscar un Pokémon por nombre o ID
         async function buscarPokemon(valor) {
             const pokemonName = valor;
-            resultado.innerHTML = "<p>Buscando...</p>";
+            resultado.innerHTML = "<p style='text-align:center; padding:30px;'>Buscando...</p>";
 
-            // Primera petición: la info básica del Pokémon
             try {
                 const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
                 const data = await respuesta.json();
 
-
-                // Segunda petición: la info de "especie" trae si es legendario o no
                 const respuestaEspecie = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`);
                 const dataEspecie = await respuestaEspecie.json();
-                const mensajeLegendario = dataEspecie.is_legendary ? "<p>⭐ ¡Pokémon legendario! ⭐</p>" : "";
+                const mensajeLegendario = dataEspecie.is_legendary ? "<p style='text-align:center;'>⭐ ¡Pokémon legendario! ⭐</p>" : "";
 
+                const respuestaCadena = await fetch(dataEspecie.evolution_chain.url);
+                const dataCadena = await respuestaCadena.json();
 
-                // Obtener la imagen animada si existe, de lo contrario usar la estática
+                const nodoActual = buscarEnCadena(dataCadena.chain, data.name);
+                let piedraFinal = "";
+
+                if (nodoActual) {
+                    for (const hijo of nodoActual.evolves_to) {
+                        const detalle = hijo.evolution_details[0];
+                        if (detalle.trigger.name === "use-item") {
+                            const nombrePiedra = detalle.item.name;
+                            const urlIconoPiedra = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${nombrePiedra}.png`;
+                            const nombrePiedraFormateado = nombrePiedra.split("-").map(function (palabra) {
+                                return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+                            }).join(" ");
+                            piedraFinal += "<div class='insignia' style='margin:12px auto;'><img class='icono-tipo' style='width:36px;height:36px;' src='" + urlIconoPiedra + "' alt='" + nombrePiedraFormateado + "'><span>Evoluciona con " + nombrePiedraFormateado + "</span></div>";
+                        }
+                    }
+                }
+
                 const spriteAnimado = data.sprites.versions["generation-v"]["black-white"].animated.front_default;
                 const imagenFinal = spriteAnimado ? spriteAnimado : data.sprites.front_default;
 
-                // Obtener los tipos y debilidades del Pokémon
+                // Color dinámico según el tipo principal (el primero de la lista)
+                const tipoPrincipalIngles = data.types[0].type.name;
+                const colorTipoPrincipal = coloresPorTipo[tipoPrincipalIngles] ? coloresPorTipo[tipoPrincipalIngles] : "#cc0000";
+
+                // Insignias de tipo: ícono arriba, nombre abajo, alineadas en fila
                 let tiposFinal = "";
                 let debilidadesFinal = "";
                 for (const tipoObj of data.types) {
@@ -78,9 +574,9 @@
                     const nombreTipoEspanol = tiposEnEspanol[nombreTipoIngles] ? tiposEnEspanol[nombreTipoIngles] : nombreTipoIngles;
                     const urlIconoTipo = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/brilliant-diamond-shining-pearl/small/${dataTipo.id}.png`;
 
-                    tiposFinal += "<img class='icono-tipo' src='" + urlIconoTipo + "' alt='" + nombreTipoEspanol + "'> " + nombreTipoEspanol + " ";
+                    tiposFinal += "<div class='insignia'><img class='icono-tipo' src='" + urlIconoTipo + "' alt='" + nombreTipoEspanol + "'><span>" + nombreTipoEspanol + "</span></div>";
 
-                    let debilidadesDeEsteTipo = "";
+                    let insigniasDebilidad = "";
                     dataTipo.damage_relations.double_damage_from.forEach(function (debilidadObj) {
                         const nombreIngles = debilidadObj.name;
                         const nombreEspanol = tiposEnEspanol[nombreIngles] ? tiposEnEspanol[nombreIngles] : nombreIngles;
@@ -89,11 +585,12 @@
                         const idDebilidad = partesUrl[partesUrl.length - 2];
                         const urlIconoDebilidad = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/brilliant-diamond-shining-pearl/small/${idDebilidad}.png`;
 
-                        debilidadesDeEsteTipo += "<img class='icono-tipo' src='" + urlIconoDebilidad + "' alt='" + nombreEspanol + "'> " + nombreEspanol + " ";
+                        insigniasDebilidad += "<div class='insignia'><img class='icono-tipo' src='" + urlIconoDebilidad + "' alt='" + nombreEspanol + "'><span>" + nombreEspanol + "</span></div>";
                     });
 
-                    debilidadesFinal += "<p>" + nombreTipoEspanol + " es débil contra: " + debilidadesDeEsteTipo + "</p>";
+                    debilidadesFinal += "<div class='bloque-debilidad-tipo'><strong>" + nombreTipoEspanol + "</strong><div class='fila-insignias'>" + insigniasDebilidad + "</div></div>";
                 }
+
                 const movimientosPorNivel = data.moves.filter(function (movimientoObj) {
                     return movimientoObj.version_group_details.some(function (detalle) {
                         return detalle.move_learn_method.name === "level-up";
@@ -113,29 +610,52 @@
 
                 let movimientosFinal = "";
                 movimientosConNivel.forEach(function (movObj) {
-                    movimientosFinal += "<p>Nv. " + movObj.nivel + " - " + movObj.nombre + "</p>";
+                    const nombreFormateado = movObj.nombre.split("-").map(function (palabra) {
+                        return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+                    }).join(" ");
+                    movimientosFinal += "<p>Nv. " + movObj.nivel + " - " + nombreFormateado + "</p>";
                 });
-                // Reproducir el sonido del Pokémon
+
                 const sonido = new Audio(data.cries.latest);
                 sonido.play();
 
-                // Guardar la URL del grito actual para poder reproducirlo nuevamente si se desea
                 urlGritoActual = data.cries.latest;
                 IdActual = data.id;
-                // Nombre con primera letra en mayúscula
                 const nombreCapitalizado = data.name.charAt(0).toUpperCase() + data.name.slice(1);
 
-                resultado.innerHTML = "<h2>" + nombreCapitalizado + "</h2>" + "<img src='" +
-                    imagenFinal + "' alt='" + data.name + "'>"
-                    + "<p>Altura: " + (data.height / 10) + " m</p>" + "<p>Peso: " + (data.weight / 10) + " kg</p>"
-                    + "<p>Tipo: " + tiposFinal + "</p>" + "<p>Débil contra: " + debilidadesFinal + "</p>" + "<p>Movimientos por nivel: " + movimientosFinal + "</p>" + mensajeLegendario
-                    + "<button class='btn-grito'> 🔊 Escuchar de nuevo</button>" + "<button class='btn-anterior'>⬅️ Anterior</button>"
-                    + "<button class='btn-siguiente'>Siguiente ➡️</button>";
+                resultado.innerHTML =
+                    "<div class='tarjeta' style='--color-tipo: " + colorTipoPrincipal + ";'>" +
+                    "<div class='seccion-info'>" +
+                    "<h2>" + nombreCapitalizado + "</h2>" +
+                    "<img src='" + imagenFinal + "' alt='" + data.name + "'>" +
+                    "<div class='estadisticas'>" +
+                    "<div class='chip-estadistica'>#" + data.id + "</div>" +
+                    "<div class='chip-estadistica'>📏 " + (data.height / 10) + " m</div>" +
+                    "<div class='chip-estadistica'>⚖️ " + (data.weight / 10) + " kg</div>" +
+                    "</div>" +
+                    "<div class='fila-insignias'>" + tiposFinal + "</div>" +
+                    mensajeLegendario + piedraFinal +
+                    "</div>" +
+                    "<div class='seccion-debilidades'>" +
+                    "<h4>Debilidades</h4>" +
+                    debilidadesFinal +
+                    "</div>" +
+                    "<div class='seccion-movimientos'>" +
+                    "<h3>Movimientos</h3>" +
+                    "<div class='lista-movimientos'>" + movimientosFinal + "</div>" +
+                    "</div>" +
+                    "<div class='fila-botones'>" +
+                    "<button class='btn-grito'>🔊 Escuchar de nuevo</button>" +
+                    "<button class='btn-anterior'>⬅️ Anterior</button>" +
+                    "<button class='btn-siguiente'>Siguiente ➡️</button>" +
+                    "</div>" +
+                    "</div>";
                 input.value = "";
             } catch (error) {
-                resultado.innerHTML = "<p>Pokémon no encontrado.</p>";
+                resultado.innerHTML = "<p style='text-align:center; padding:30px;'>Pokémon no encontrado.</p>";
             }
         }
+
         button.addEventListener('click', function () {
             buscarPokemon(input.value);
         });
