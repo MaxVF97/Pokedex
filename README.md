@@ -48,7 +48,18 @@ Construido con **HTML, CSS y JavaScript puro**, sin frameworks ni librerías. Co
 - Animaciones con `@keyframes`, incluyendo animaciones sincronizadas entre múltiples elementos
 
 ## 📸 Vista previa
-![Vista previa de la app](preview.png)
+
+**Búsqueda individual**
+![Búsqueda individual](preview-individual.jpeg)
+
+**Modo comparación**
+![Modo comparación](preview-comparacion.jpeg)
+
+**Pokémon legendario**
+![Efecto legendario](preview-legendario.jpeg)
+
+**Modo comparación LEGENDARIO!**
+![Modo comparación LEGENDARIO](preview-comparacion-legendario.jpeg)
 
 ---
 Proyecto hecho como parte de mi aprendizaje de desarrollo web front-end.
