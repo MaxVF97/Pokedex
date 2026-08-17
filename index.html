@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Black+Ops+One&display=swap" rel="stylesheet">        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Variables de color para la Pokedex */
         :root {
             --rojo: #cc0000;
             --rojo-oscuro: #8f0000;
@@ -18,6 +19,7 @@
             --amarillo: #ffcb05;
             --turquesa: #1ecfd4;
             --azul-pokemon: #2450a4;
+            --turquesa-oscuro: #0e8a90;
         }
 
         * {
@@ -66,10 +68,10 @@
         }
 
         .lente-pokedex {
-            width: 56px;
-            height: 56px;
+            width: 78px;
+            height: 78px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #ffffff, var(--turquesa) 45%, #0a7a80 100%);
+            background: radial-gradient(circle at 35% 30%, #4fd8dc, var(--turquesa-oscuro) 45%, #0e8a90 100%);
             border: 4px solid var(--blanco);
             box-shadow: 0 0 0 3px var(--negro), 0 3px 8px rgba(0, 0, 0, 0.4);
             animation: parpadeo 1.6s ease-in-out infinite;
@@ -83,13 +85,13 @@
             }
 
             50% {
-                filter: brightness(0.55);
+                filter: brightness(0.3);
             }
         }
 
         .luz {
-            width: 20px;
-            height: 20px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             border: 2px solid var(--negro);
         }
@@ -107,6 +109,36 @@
         .luz-verde {
             background-color: #4fd66b;
             box-shadow: 0 0 8px 2px #4fd66b;
+        }
+
+        .luces-pokedex.estado-buscando .luz {
+            background-color: var(--amarillo) !important;
+            box-shadow: 0 0 10px 3px var(--amarillo) !important;
+            animation: parpadeo-led 0.8s ease-in-out infinite;
+        }
+
+        .luces-pokedex.estado-error .luz {
+            background-color: #ff2020 !important;
+            box-shadow: 0 0 10px 3px #ff2020 !important;
+            animation: parpadeo-led 0.6s ease-in-out infinite;
+        }
+
+        .luces-pokedex.estado-reset .luz {
+            background-color: #4fd66b !important;
+            box-shadow: 0 0 10px 3px #4fd66b !important;
+            animation: parpadeo-led 0.5s ease-in-out 2;
+        }
+
+        @keyframes parpadeo-led {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
         }
 
         h1 {
@@ -167,6 +199,48 @@
             -webkit-text-stroke: 1px var(--negro);
             font-weight: 800;
             font-size: 16px;
+        }
+
+        #btn-comparar,
+        #btn-reset {
+            display: none;
+            padding: 12px 22px;
+            border-radius: 30px;
+            border: 2px solid var(--negro);
+            background-color: var(--blanco);
+            color: var(--rojo);
+            font-weight: 700;
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        #btn-comparar.visible {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        #btn-reset.visible {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        #btn-comparar:hover:not(:disabled),
+        #btn-reset:hover:not(:disabled) {
+            background-color: var(--amarillo);
+            transform: translateY(-1px);
+        }
+
+        #btn-comparar:disabled,
+        #btn-reset:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        #btn-comparar.activo {
+            background-color: var(--amarillo);
+            box-shadow: 0 0 0 3px var(--rojo-oscuro);
         }
 
         .tarjeta {
@@ -344,6 +418,10 @@
             background-color: var(--negro);
         }
 
+        .contenedor-comparacion .btn-grito {
+            width: 200px;
+        }
+
         .tarjeta.legendaria {
             position: relative;
             animation: pulso-legendario 2.8s ease-in-out infinite;
@@ -391,7 +469,6 @@
             }
         }
 
-        /* --- Texto "Pokémon Legendario": plata metálica + borde del color del tipo --- */
         .texto-legendario {
             display: flex;
             align-items: center;
@@ -442,8 +519,136 @@
             }
         }
 
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-contenido {
+            background-color: var(--blanco);
+            border-radius: 18px;
+            border: 4px solid var(--rojo);
+            padding: 30px;
+            text-align: center;
+            max-width: 320px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-cerrar-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background-color: var(--rojo);
+            color: var(--blanco);
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal-contenido img {
+            width: 120px;
+            height: 120px;
+            image-rendering: pixelated;
+            margin-bottom: 10px;
+        }
+
+        .modal-contenido p {
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--rojo-oscuro);
+            margin: 0;
+        }
+
+        .modal-buscando-contenido {
+            border-color: var(--amarillo);
+        }
+
+        .modal-buscando-contenido p {
+            color: #b8860b;
+        }
+
+        .spinner-pokebola {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            border: 6px solid var(--crema);
+            border-top: 6px solid var(--amarillo);
+            animation: girar-spinner 0.9s linear infinite;
+        }
+
+        @keyframes girar-spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-comparar-contenido {
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-comparar-contenido input {
+            padding: 10px 14px;
+            border-radius: 20px;
+            border: 2px solid var(--rojo);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .modal-comparar-contenido #btn-submit-comparar {
+            margin-top: 6px;
+            padding: 12px;
+            border-radius: 20px;
+            border: none;
+            background-color: var(--rojo);
+            color: var(--blanco);
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-comparar-contenido #btn-submit-comparar:hover {
+            background-color: var(--rojo-oscuro);
+        }
+
+        /* Contenedor para las 2 tarjetas lado a lado */
+        .contenedor-comparacion {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            align-items: start;
+        }
+
+        .contenedor-comparacion .tarjeta {
+            width: 100%;
+            max-width: none;
+            grid-template-columns: 1fr;
+        }
+
         @media (max-width: 750px) {
-            .tarjeta {
+            .contenedor-comparacion {
                 grid-template-columns: 1fr;
             }
 
@@ -558,7 +763,7 @@
     </svg>
 
     <div class="encabezado">
-        <div class="luces-pokedex">
+        <div class="luces-pokedex" id="luces-pokedex">
             <div class="lente-pokedex"></div>
             <div class="luz luz-roja"></div>
             <div class="luz luz-amarilla"></div>
@@ -569,21 +774,67 @@
             <input type="text" id="pokemon-input" placeholder="Ingresa el nombre o ID del Pokémon">
             <button id="btn-buscar">Buscar</button>
             <button id="btn-random"><span class="signo-interrogacion">?</span> Aleatorio</button>
+            <button id="btn-comparar" disabled>
+                <svg width="18" height="14" viewBox="0 0 40 24" style="vertical-align:-2px; margin-right:4px;">
+                    <text x="0" y="18" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18"
+                        fill="currentColor">VS</text>
+                </svg>Comparar
+            </button>
+            <button id="btn-reset" disabled>🔄 Reset</button>
         </div>
     </div>
 
     <div id="resultado">
     </div>
+    <!-- Ventana emergente: Pokémon no encontrado, con su grito repitiéndose -->
+    <div class="modal-overlay" id="modal-no-encontrado">
+        <div class="modal-contenido">
+            <button class="btn-cerrar-modal" id="btn-cerrar-modal">✕</button>
+            <img id="gif-no-encontrado" src="" alt="Pokémon no encontrado">
+            <p id="mensaje-no-encontrado">¡Pokémon no encontrado!</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-buscando">
+        <div class="modal-contenido modal-buscando-contenido">
+            <div class="spinner-pokebola"></div>
+            <p>Buscando Pokémon...</p>
+        </div>
+    </div>
 
     <script>
-        // Obtener referencias a los elementos del DOM
+        // Variables globales
         const input = document.getElementById('pokemon-input');
         const button = document.getElementById('btn-buscar');
         const resultado = document.getElementById('resultado');
         const buttonRandom = document.getElementById('btn-random');
+        const buttonComparar = document.getElementById('btn-comparar');
+        const lucesPokedex = document.getElementById('luces-pokedex');
+        const modalNoEncontrado = document.getElementById('modal-no-encontrado');
+        const gifNoEncontrado = document.getElementById('gif-no-encontrado');
+        const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+        const buttonReset = document.getElementById('btn-reset');
         let urlGritoActual = "";
         let IdActual = null;
+        let modoComparacion = false;      // ¿estamos esperando el 2do Pokémon?
+        let datosPokemon1 = null;         // guarda TODO el objeto que regresa obtenerDatosPokemon del 1er Pokémon
+        let intervaloSincronizado = null; // para sincronizar animaciones si ambos son legendarios (lo usamos más adelante)
+        let ultimoIdNoEncontrado = null;
+        let intervaloSonidoModal = null;
+        let datosActuales = null; // guarda los datos completos del Pokémon que está en pantalla ahora mismo
 
+
+        const modalBuscando = document.getElementById('modal-buscando');
+        // Funciones para mostrar y ocultar la ventana emergente de "Buscando Pokémon"
+        function mostrarModalBuscando() {
+            modalBuscando.style.display = "flex";
+        }
+
+        function ocultarModalBuscando() {
+            modalBuscando.style.display = "none";
+        }
+
+        // Traducciones de tipos al español
         const tiposEnEspanol = {
             normal: "Normal", fire: "Fuego", water: "Agua", electric: "Eléctrico",
             grass: "Planta", ice: "Hielo", fighting: "Lucha", poison: "Veneno",
@@ -592,6 +843,7 @@
             steel: "Acero", fairy: "Hada"
         };
 
+        // Colores de fondo por tipo
         const coloresPorTipo = {
             normal: "#a8a878", fire: "#e8620f", water: "#4287f5", electric: "#e8c000",
             grass: "#4caf50", ice: "#5cd0d0", fighting: "#c03028", poison: "#a040a0",
@@ -600,6 +852,58 @@
             steel: "#7d7d99", fairy: "#e57ea0"
         };
 
+        // Muestra la ventana emergente con un Pokémon animado aleatorio y su grito repitiéndose cada 5s
+        async function mostrarModalNoEncontrado(mensaje) {
+            document.getElementById('mensaje-no-encontrado').textContent = mensaje || "¡Pokémon no encontrado!";
+            let idAleatorio;
+            do {
+                idAleatorio = Math.floor(Math.random() * 649) + 1;
+            } while (idAleatorio === ultimoIdNoEncontrado);
+            ultimoIdNoEncontrado = idAleatorio;
+
+            const urlGif = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${idAleatorio}.gif`;
+            gifNoEncontrado.src = urlGif;
+            modalNoEncontrado.style.display = "flex";
+
+            // Intentamos reproducir el grito del Pokémon, pero si falla, la ventana sigue funcionando igual
+            try {
+                const respuestaModal = await fetch(`https://pokeapi.co/api/v2/pokemon/${idAleatorio}`);
+                const dataModal = await respuestaModal.json();
+                const urlGritoModal = dataModal.cries.latest;
+
+                const sonidoModal = new Audio(urlGritoModal);
+                sonidoModal.play();
+
+                if (intervaloSonidoModal) {
+                    clearInterval(intervaloSonidoModal);
+                }
+                intervaloSonidoModal = setInterval(function () {
+                    const sonidoRepetido = new Audio(urlGritoModal);
+                    sonidoRepetido.play();
+                }, 5000);
+            } catch (error) {
+                // si falla el sonido, la ventana sigue funcionando igual, solo sin audio
+            }
+        }
+        // Función para cerrar la ventana emergente y detener el sonido
+        function cerrarModalNoEncontrado() {
+            modalNoEncontrado.style.display = "none";
+            lucesPokedex.classList.remove("estado-error");
+            if (intervaloSonidoModal) {
+                clearInterval(intervaloSonidoModal);
+                intervaloSonidoModal = null;
+            }
+        }
+        // Agregamos el evento de clic al botón de cerrar la ventana emergente
+        btnCerrarModal.addEventListener('click', cerrarModalNoEncontrado);
+
+        modalNoEncontrado.addEventListener('click', function (event) {
+            if (event.target === modalNoEncontrado) {
+                cerrarModalNoEncontrado();
+            }
+        });
+
+        // Función recursiva para buscar un Pokémon en la cadena de evolución
         function buscarEnCadena(nodo, nombreBuscado) {
             if (nodo.species.name === nombreBuscado) {
                 return nodo;
@@ -612,11 +916,34 @@
             }
             return null;
         }
+        // Función para igualar las alturas de las secciones de información, debilidades y movimientos en la comparación
+        function igualarAlturasComparacion() {
+            const selectores = ['.seccion-info', '.seccion-debilidades', '.seccion-movimientos'];
 
-        async function buscarPokemon(valor) {
+            selectores.forEach(function (selector) {
+                const cajas = document.querySelectorAll('.contenedor-comparacion ' + selector);
+                if (cajas.length < 2) return;
+
+                cajas.forEach(function (caja) { caja.style.minHeight = "auto"; });
+
+                let alturaMaxima = 0;
+                cajas.forEach(function (caja) {
+                    if (caja.offsetHeight > alturaMaxima) {
+                        alturaMaxima = caja.offsetHeight;
+                    }
+                });
+
+                cajas.forEach(function (caja) {
+                    caja.style.minHeight = alturaMaxima + "px";
+                });
+            });
+        }
+
+        // Función principal para obtener los datos del Pokémon y mostrarlos en la tarjeta
+        async function obtenerDatosPokemon(valor) {
             const pokemonName = valor;
-            resultado.innerHTML = "<p style='text-align:center; padding:30px;'>Buscando...</p>";
 
+            // Intentamos obtener los datos del Pokémon, y si falla, mostramos la ventana emergente
             try {
                 const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
                 const data = await respuesta.json();
@@ -635,6 +962,7 @@
                 const nodoActual = buscarEnCadena(dataCadena.chain, data.name);
                 let piedraFinal = "";
 
+                // Si el Pokémon tiene evoluciones que requieren un ítem, mostramos el ícono del ítem y su nombre
                 if (nodoActual) {
                     for (const hijo of nodoActual.evolves_to) {
                         const detalle = hijo.evolution_details[0];
@@ -644,17 +972,19 @@
                             const nombrePiedraFormateado = nombrePiedra.split("-").map(function (palabra) {
                                 return palabra.charAt(0).toUpperCase() + palabra.slice(1);
                             }).join(" ");
-                            piedraFinal += "<div class='insignia' style='margin:12px auto;'><img class='icono-tipo' style='width:36px;height:36px;' src='" + urlIconoPiedra + "' alt='" + nombrePiedraFormateado + "'><span>Evoluciona con " + nombrePiedraFormateado + "</span></div>";
+                            piedraFinal += "<div class='insignia' style='margin:12px auto;'><img class='icono-tipo' style='width:36px;height:36px;' src='" + urlIconoPiedra + "' alt='" + nombrePiedraFormateado + "' onerror=\"this.style.display='none'\"><span>Evoluciona con " + nombrePiedraFormateado + "</span></div>";
                         }
                     }
                 }
 
+                // Obtenemos la imagen animada del Pokémon si está disponible, de lo contrario usamos la imagen estática
                 const spriteAnimado = data.sprites.versions["generation-v"]["black-white"].animated.front_default;
                 const imagenFinal = spriteAnimado ? spriteAnimado : data.sprites.front_default;
 
                 const tipoPrincipalIngles = data.types[0].type.name;
                 const colorTipoPrincipal = coloresPorTipo[tipoPrincipalIngles] ? coloresPorTipo[tipoPrincipalIngles] : "#cc0000";
 
+                // Creamos las insignias de tipos y debilidades
                 let tiposFinal = "";
                 let debilidadesFinal = "";
                 for (const tipoObj of data.types) {
@@ -707,46 +1037,143 @@
                     movimientosFinal += "<p>Nv. " + movObj.nivel + " - " + nombreFormateado + "</p>";
                 });
 
-                const sonido = new Audio(data.cries.latest);
-                sonido.play();
+                return {
+                    data,
+                    dataEspecie,
+                    colorTipoPrincipal,
+                    tiposFinal,
+                    debilidadesFinal,
+                    movimientosFinal,
+                    mensajeLegendario,
+                    piedraFinal,
+                    imagenFinal
+                };
 
-                urlGritoActual = data.cries.latest;
-                IdActual = data.id;
-                const nombreCapitalizado = data.name.charAt(0).toUpperCase() + data.name.slice(1);
-
-                const claseLegendaria = dataEspecie.is_legendary ? " legendaria" : "";
-
-                resultado.innerHTML =
-                    "<div class='tarjeta" + claseLegendaria + "' style='--color-tipo: " + colorTipoPrincipal + ";'>" +
-                    "<div class='seccion-info'>" +
-                    "<h2>" + nombreCapitalizado + "</h2>" +
-                    "<img src='" + imagenFinal + "' alt='" + data.name + "'>" +
-                    "<div class='estadisticas'>" +
-                    "<div class='chip-estadistica'>#" + data.id + "</div>" +
-                    "<div class='chip-estadistica'>📏 " + (data.height / 10) + " m</div>" +
-                    "<div class='chip-estadistica'>⚖️ " + (data.weight / 10) + " kg</div>" +
-                    "</div>" +
-                    "<div class='fila-insignias'>" + tiposFinal + "</div>" +
-                    mensajeLegendario + piedraFinal +
-                    "</div>" +
-                    "<div class='seccion-debilidades'>" +
-                    "<h4>Debilidades</h4>" +
-                    debilidadesFinal +
-                    "</div>" +
-                    "<div class='seccion-movimientos'>" +
-                    "<h3>Movimientos</h3>" +
-                    "<div class='lista-movimientos'>" + movimientosFinal + "</div>" +
-                    "</div>" +
-                    "<div class='fila-botones'>" +
-                    "<button class='btn-grito'>🔊 Escuchar de nuevo</button>" +
-                    "<button class='btn-anterior'>⬅️ Anterior</button>" +
-                    "<button class='btn-siguiente'>Siguiente ➡️</button>" +
-                    "</div>" +
-                    "</div>";
-                input.value = "";
             } catch (error) {
-                resultado.innerHTML = "<p style='text-align:center; padding:30px;'>Pokémon no encontrado.</p>";
+                throw error;
             }
+        }
+
+        function generarTarjetaHTML(datos, esComparacion) {
+            // "Desempacamos" el objeto que regresa obtenerDatosPokemon,
+            const { data, dataEspecie, colorTipoPrincipal, tiposFinal,
+                debilidadesFinal, movimientosFinal, mensajeLegendario,
+                piedraFinal, imagenFinal } = datos;
+
+            // estas dos SÍ dependen de "datos" y hay que recalcularlas aquí,
+            const nombreCapitalizado = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+            const claseLegendaria = dataEspecie.is_legendary ? " legendaria" : "";
+
+            return "<div class='tarjeta" + claseLegendaria + "' style='--color-tipo: " + colorTipoPrincipal + ";'>" +
+                "<div class='seccion-info'>" +
+                "<h2>" + nombreCapitalizado + "</h2>" +
+                "<img src='" + imagenFinal + "' alt='" + data.name + "'>" +
+                "<div class='estadisticas'>" +
+                "<div class='chip-estadistica'>#" + data.id + "</div>" +
+                "<div class='chip-estadistica'>📏 " + (data.height / 10) + " m</div>" +
+                "<div class='chip-estadistica'>⚖️ " + (data.weight / 10) + " kg</div>" +
+                "</div>" +
+                "<div class='fila-insignias'>" + tiposFinal + "</div>" +
+                mensajeLegendario + piedraFinal +
+                "</div>" +
+                "<div class='seccion-debilidades'>" +
+                "<h4>Debilidades</h4>" +
+                debilidadesFinal +
+                "</div>" +
+                "<div class='seccion-movimientos'>" +
+                "<h3>Movimientos</h3>" +
+                "<div class='lista-movimientos'>" + movimientosFinal + "</div>" +
+                "</div>" +
+                "<div class='fila-botones'>" +
+                "<button class='btn-grito' data-sonido='" + data.cries.latest + "'>🔊 Escuchar de nuevo</button>" +
+                (esComparacion ? "" : "<button class='btn-anterior'>⬅️ Anterior</button><button class='btn-siguiente'>Siguiente ➡️</button>") +
+                "</div>" +
+                "</div>";
+        }
+
+        // Función principal para buscar un Pokémon y mostrar su tarjeta
+        async function buscarPokemon(valor) {
+            if (!valor || valor.toString().trim() === "") {
+                mostrarModalNoEncontrado("¡Campo vacío! Escribe un nombre o ID.");
+                return;
+            }
+            if (modoComparacion) {
+                compararPokemon(valor);
+                return;
+            }
+
+            mostrarModalBuscando();
+            lucesPokedex.classList.remove("estado-error");
+            lucesPokedex.classList.add("estado-buscando");
+
+            try {
+                const datos = await obtenerDatosPokemon(valor);
+                const htmlTarjeta = generarTarjetaHTML(datos, false);
+                ocultarModalBuscando();
+                resultado.innerHTML = htmlTarjeta;
+                const sonido = new Audio(datos.data.cries.latest);
+                sonido.play();
+                urlGritoActual = datos.data.cries.latest;
+                IdActual = datos.data.id;
+                buttonComparar.classList.add('visible');
+                buttonReset.classList.add('visible');
+                buttonComparar.disabled = false;
+                buttonReset.disabled = false;
+                input.value = "";
+                lucesPokedex.classList.remove("estado-buscando");
+                datosActuales = datos;
+
+            } catch (error) {
+                ocultarModalBuscando();
+                resultado.innerHTML = "";
+                lucesPokedex.classList.remove("estado-buscando");
+                lucesPokedex.classList.add("estado-error");
+                buttonReset.classList.add('visible');
+                buttonReset.disabled = false;
+                mostrarModalNoEncontrado();
+
+            }
+        }
+
+        // Función para comparar dos Pokémon y mostrar sus tarjetas lado a lado
+        async function compararPokemon(valor) {
+            mostrarModalBuscando();
+            lucesPokedex.classList.remove("estado-error");
+            lucesPokedex.classList.add("estado-buscando");
+
+            try {
+                // 1) Trae los datos del 2do Pokémon
+                const datos2 = await obtenerDatosPokemon(valor);
+
+                // 2) Genera el HTML de ambas tarjetas
+                const html1 = generarTarjetaHTML(datosPokemon1, true);
+                const html2 = generarTarjetaHTML(datos2, true);
+                ocultarModalBuscando();
+                // 3) Pinta las 2 juntas
+                resultado.innerHTML = "<div class='contenedor-comparacion'>" + html1 + html2 + "</div>";
+                igualarAlturasComparacion();
+                const sonido1 = new Audio(datosPokemon1.data.cries.latest);
+                sonido1.play();
+
+                setTimeout(function () {
+                    const sonido2 = new Audio(datos2.data.cries.latest);
+                    sonido2.play();
+                }, 2000);
+
+                modoComparacion = false;
+                buttonComparar.classList.remove('activo');
+                buttonComparar.disabled = false;
+                lucesPokedex.classList.remove("estado-buscando");
+
+            } catch (error) {
+                ocultarModalBuscando();
+                lucesPokedex.classList.remove("estado-buscando");
+                lucesPokedex.classList.add("estado-error");
+                buttonReset.classList.add('visible');
+                buttonReset.disabled = false;
+                mostrarModalNoEncontrado();
+            }
+
         }
 
         button.addEventListener('click', function () {
@@ -761,9 +1188,38 @@
             const randomId = Math.floor(Math.random() * 1010) + 1;
             buscarPokemon(randomId);
         });
+
+        buttonComparar.addEventListener('click', function () {
+            datosPokemon1 = datosActuales;
+            modoComparacion = true;
+            buttonComparar.classList.add('activo');
+            buttonComparar.disabled = true;
+            input.value = "";
+        });
+
+        buttonReset.addEventListener('click', function () {
+            resultado.innerHTML = "";
+            input.value = "";
+            urlGritoActual = "";
+            IdActual = null;
+            datosActuales = null;
+            datosPokemon1 = null;
+            modoComparacion = false;
+            buttonComparar.classList.remove('activo', 'visible');
+            buttonComparar.disabled = true;
+            buttonReset.classList.remove('visible');
+            buttonReset.disabled = true;
+            lucesPokedex.classList.remove("estado-buscando", "estado-error");
+            lucesPokedex.classList.add("estado-reset");
+            setTimeout(function () {
+                lucesPokedex.classList.remove("estado-reset");
+            }, 1000);
+        });
+
+
         resultado.addEventListener('click', function (event) {
             if (event.target.classList.contains('btn-grito')) {
-                const sonido = new Audio(urlGritoActual);
+                const sonido = new Audio(event.target.dataset.sonido);
                 sonido.play();
             }
             if (event.target.classList.contains('btn-anterior')) {
