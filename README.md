@@ -11,6 +11,16 @@ Buscador de Pokémon con datos en tiempo real y diseño inspirado en un disposit
   - Reproducción secuencial de sus gritos (con diferencia de 2 segundos entre uno y otro)
   - Sincronización automática de las animaciones si ambos son legendarios
   - Alturas de cada sección igualadas entre ambas tarjetas para una comparación visual prolija
+- ⚔️ **Modo comparación mejorado**: al re-comparar con una tarjeta ya en
+  pantalla, elige cuál conservar con clic + confirmación; botón dinámico
+  que cambia a "Cancelar" para salir del modo comparación en cualquier
+  momento
+- 📊 Estadísticas base (HP, Ataque, Defensa, Ataque/Defensa Especial,
+  Velocidad) con barras de progreso, con efecto de brillo pulsante en
+  Pokémon legendarios
+- 🎨 Fondo temático por tipo en cada sección de la tarjeta, generado con
+  los íconos de tipo de la propia API
+
 - 🔊 Grito del Pokémon reproducido automáticamente, con botón para repetirlo
 - 🏷️ Tipo(s) del Pokémon, con ícono e identificación en español
 - ⚔️ Debilidades por tipo, calculadas consultando la API en tiempo real, con íconos
