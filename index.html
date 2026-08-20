@@ -8,8 +8,10 @@
     <title>Pokedex</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Bruno+Ace+SC&family=Carattere&family=Changa:wght@200..800&family=Mea+Culpa&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Variables de color para la Pokedex */
         :root {
             --rojo: #cc0000;
             --rojo-oscuro: #8f0000;
@@ -22,9 +24,7 @@
             --turquesa-oscuro: #0e8a90;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -42,7 +42,7 @@
 
         .icono-flotante {
             position: absolute;
-            opacity: 0.07;
+            opacity: 0.08;
             pointer-events: none;
             z-index: 0;
         }
@@ -68,25 +68,28 @@
         }
 
         .lente-pokedex {
+            position: relative;
             width: 78px;
             height: 78px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #4fd8dc, var(--turquesa-oscuro) 45%, #0e8a90 100%);
+            background-color: #0a2a2c;
             border: 4px solid var(--blanco);
             box-shadow: 0 0 0 3px var(--negro), 0 3px 8px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .lente-pokedex::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #4fd8dc, var(--turquesa-oscuro) 45%, #0e8a90 100%);
             animation: parpadeo 1.6s ease-in-out infinite;
         }
 
         @keyframes parpadeo {
-
-            0%,
-            100% {
-                filter: brightness(1);
-            }
-
-            50% {
-                filter: brightness(0.3);
-            }
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(0.3); }
         }
 
         .luz {
@@ -96,20 +99,9 @@
             border: 2px solid var(--negro);
         }
 
-        .luz-roja {
-            background-color: #ff3b3b;
-            box-shadow: 0 0 8px 2px #ff3b3b;
-        }
-
-        .luz-amarilla {
-            background-color: var(--amarillo);
-            box-shadow: 0 0 8px 2px var(--amarillo);
-        }
-
-        .luz-verde {
-            background-color: #4fd66b;
-            box-shadow: 0 0 8px 2px #4fd66b;
-        }
+        .luz-roja { background-color: #ff3b3b; box-shadow: 0 0 8px 2px #ff3b3b; }
+        .luz-amarilla { background-color: var(--amarillo); box-shadow: 0 0 8px 2px var(--amarillo); }
+        .luz-verde { background-color: #4fd66b; box-shadow: 0 0 8px 2px #4fd66b; }
 
         .luces-pokedex.estado-buscando .luz {
             background-color: var(--amarillo) !important;
@@ -130,30 +122,21 @@
         }
 
         @keyframes parpadeo-led {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.2;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
         }
 
         h1 {
-            font-family: 'Baloo 2', sans-serif;
-            font-weight: 800;
+            font-family: 'Bruno Ace SC', sans-serif;
+            font-weight: 400;
             color: var(--amarillo);
             text-align: center;
             margin: 5px 0 18px 0;
-            font-size: 68px;
+            font-size: 60px;
             letter-spacing: 1px;
-            -webkit-text-stroke: 4px var(--azul-pokemon);
-            text-shadow:
-                4px 4px 0 var(--azul-pokemon),
-                7px 7px 0 #1a3a7a;
-            line-height: 1;
+            -webkit-text-stroke: 3px var(--azul-pokemon);
+            text-shadow: 4px 4px 0 var(--azul-pokemon), 7px 7px 0 #1a3a7a;
+            line-height: 1.1;
         }
 
         .fila-input {
@@ -174,8 +157,7 @@
             outline: none;
         }
 
-        #btn-buscar,
-        #btn-random {
+        #btn-buscar, #btn-random {
             padding: 12px 22px;
             border-radius: 30px;
             border: 2px solid var(--negro);
@@ -188,8 +170,7 @@
             transition: 0.2s;
         }
 
-        #btn-buscar:hover,
-        #btn-random:hover {
+        #btn-buscar:hover, #btn-random:hover {
             background-color: var(--amarillo);
             transform: translateY(-1px);
         }
@@ -201,8 +182,7 @@
             font-size: 16px;
         }
 
-        #btn-comparar,
-        #btn-reset {
+        #btn-comparar, #btn-reset {
             display: none;
             padding: 12px 22px;
             border-radius: 30px;
@@ -216,31 +196,30 @@
             transition: 0.2s;
         }
 
-        #btn-comparar.visible {
-            display: inline-flex;
-            align-items: center;
-        }
+        #btn-comparar.visible { display: inline-flex; align-items: center; }
+        #btn-reset.visible { display: inline-flex; align-items: center; }
 
-        #btn-reset.visible {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        #btn-comparar:hover:not(:disabled),
-        #btn-reset:hover:not(:disabled) {
+        #btn-comparar:hover:not(.activo), #btn-reset:hover:not(:disabled) {
             background-color: var(--amarillo);
             transform: translateY(-1px);
         }
 
-        #btn-comparar:disabled,
         #btn-reset:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
 
+        /* Botón "Comparar" pasa a rojo y funciona como "Cancelar" mientras el modo comparación está activo */
         #btn-comparar.activo {
-            background-color: var(--amarillo);
+            background-color: var(--rojo);
+            color: var(--blanco);
+            border-color: var(--rojo-oscuro);
             box-shadow: 0 0 0 3px var(--rojo-oscuro);
+        }
+
+        #btn-comparar.activo:hover {
+            background-color: var(--rojo-oscuro);
+            transform: translateY(-1px);
         }
 
         .tarjeta {
@@ -254,20 +233,22 @@
             position: relative;
             z-index: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
         }
 
-        .tarjeta>div {
-            padding: 20px;
+        .tarjeta > div { padding: 20px; }
+
+        .seccion-info { border-right: 2px dashed #ecd6d6; }
+
+        .seccion-info, .seccion-debilidades, .seccion-movimientos, .seccion-stats {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                var(--textura-tipo, none);
+            background-repeat: no-repeat, repeat;
+            background-size: cover, 34px 34px;
         }
 
-        .seccion-info {
-            border-right: 2px dashed #ecd6d6;
-        }
-
-        .seccion-debilidades {
-            border-right: 2px dashed #ecd6d6;
-        }
+        .seccion-debilidades { border-right: 2px dashed #ecd6d6; }
 
         .tarjeta h2 {
             font-family: 'Baloo 2', sans-serif;
@@ -278,8 +259,13 @@
             font-size: 26px;
         }
 
-        .tarjeta h3,
-        .tarjeta h4 {
+        .tarjeta.legendaria h2 {
+            font-family: 'Tangerine', cursive;
+            font-weight: 700;
+            font-size: 46px;
+        }
+
+        .tarjeta h3, .tarjeta h4 {
             font-family: 'Baloo 2', sans-serif;
             font-weight: 700;
             color: var(--blanco);
@@ -314,6 +300,49 @@
             font-weight: 700;
         }
 
+        .seccion-stats { display: flex; flex-direction: column; }
+
+        .fila-stat { margin-bottom: 10px; }
+
+        .fila-stat .etiqueta-stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .barra-stat-fondo {
+            background-color: var(--crema);
+            border: 1.5px solid var(--color-tipo, var(--rojo));
+            border-radius: 8px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .barra-stat-relleno {
+            height: 100%;
+            background-color: var(--color-tipo, var(--rojo));
+            border-radius: 8px 0 0 8px;
+        }
+
+        .tarjeta.legendaria .barra-stat-relleno {
+            animation: respiracion-brillo 2.4s ease-in-out infinite;
+        }
+
+        @keyframes respiracion-brillo {
+            0%, 100% {
+                box-shadow: 0 0 4px 1px var(--color-tipo, var(--rojo));
+                filter: brightness(1);
+            }
+            50% {
+                box-shadow:
+                    0 0 10px 3px #ffffff,
+                    0 0 22px 8px var(--color-tipo, var(--rojo));
+                filter: brightness(1.7);
+            }
+        }
+
         .fila-insignias {
             display: flex;
             flex-wrap: wrap;
@@ -330,11 +359,7 @@
             width: 58px;
         }
 
-        .insignia .icono-tipo {
-            width: 30px;
-            height: 30px;
-            border-radius: 7px;
-        }
+        .insignia .icono-tipo { width: 30px; height: 30px; border-radius: 7px; }
 
         .insignia span {
             font-size: 11px;
@@ -343,9 +368,7 @@
             line-height: 1.1;
         }
 
-        .bloque-debilidad-tipo {
-            margin-bottom: 14px;
-        }
+        .bloque-debilidad-tipo { margin-bottom: 14px; }
 
         .bloque-debilidad-tipo strong {
             display: block;
@@ -357,6 +380,7 @@
         .seccion-movimientos {
             display: flex;
             flex-direction: column;
+            border-right: 2px dashed #ecd6d6;
         }
 
         .lista-movimientos {
@@ -375,10 +399,7 @@
             font-weight: 500;
         }
 
-        .lista-movimientos::-webkit-scrollbar {
-            width: 6px;
-        }
-
+        .lista-movimientos::-webkit-scrollbar { width: 6px; }
         .lista-movimientos::-webkit-scrollbar-thumb {
             background-color: var(--color-tipo, var(--rojo));
             border-radius: 10px;
@@ -414,13 +435,8 @@
             transform: translateY(-2px);
         }
 
-        .fila-botones .btn-grito {
-            background-color: var(--negro);
-        }
-
-        .contenedor-comparacion .btn-grito {
-            width: 200px;
-        }
+        .fila-botones .btn-grito { background-color: var(--negro); }
+        .contenedor-comparacion .btn-grito { width: 200px; }
 
         .tarjeta.legendaria {
             position: relative;
@@ -428,13 +444,10 @@
         }
 
         @keyframes pulso-legendario {
-
-            0%,
-            100% {
+            0%, 100% {
                 border-color: var(--color-tipo, var(--rojo));
                 box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 18px 2px var(--color-tipo, var(--rojo));
             }
-
             50% {
                 border-color: #e8e8ec;
                 box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 26px 6px rgba(255, 255, 255, 0.85);
@@ -456,17 +469,9 @@
         }
 
         @keyframes destello-legendario {
-            0% {
-                left: -60%;
-            }
-
-            55% {
-                left: 130%;
-            }
-
-            100% {
-                left: 130%;
-            }
+            0% { left: -60%; }
+            55% { left: 130%; }
+            100% { left: 130%; }
         }
 
         .texto-legendario {
@@ -474,49 +479,35 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            font-family: 'Baloo 2', sans-serif;
-            font-weight: 800;
-            font-size: 30px;
+            font-family: 'Mea Culpa', cursive;
+            font-weight: 400;
+            font-size: 34px;
             text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
             margin: 14px 0;
             background: linear-gradient(90deg, #b8860b 10%, #ffe9a8 35%, #fff8e0 50%, #ffe9a8 65%, #b8860b 90%);
             background-size: 250% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 1.5px var(--color-tipo, var(--rojo));
+            -webkit-text-stroke: 1px var(--color-tipo, var(--rojo));
             animation: brillo-texto 4s linear infinite;
         }
 
         @keyframes brillo-texto {
-            0% {
-                background-position: 0% center;
-            }
-
-            100% {
-                background-position: -250% center;
-            }
+            0% { background-position: 0% center; }
+            100% { background-position: -250% center; }
         }
 
-        .estrella-legendaria {
-            width: 34px;
-            height: 34px;
+        .icono-legendario {
+            width: 38px;
+            height: 38px;
             flex-shrink: 0;
             animation: parpadeo-estrella 4s ease-in-out infinite;
         }
 
         @keyframes parpadeo-estrella {
-
-            0%,
-            100% {
-                filter: brightness(1);
-            }
-
-            50% {
-                filter: brightness(1.6);
-            }
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.6); }
         }
 
         .modal-overlay {
@@ -570,13 +561,8 @@
             margin: 0;
         }
 
-        .modal-buscando-contenido {
-            border-color: var(--amarillo);
-        }
-
-        .modal-buscando-contenido p {
-            color: #b8860b;
-        }
+        .modal-buscando-contenido { border-color: var(--amarillo); }
+        .modal-buscando-contenido p { color: #b8860b; }
 
         .spinner-pokebola {
             width: 60px;
@@ -589,49 +575,10 @@
         }
 
         @keyframes girar-spinner {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .modal-comparar-contenido {
-            max-width: 340px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .modal-comparar-contenido input {
-            padding: 10px 14px;
-            border-radius: 20px;
-            border: 2px solid var(--rojo);
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .modal-comparar-contenido #btn-submit-comparar {
-            margin-top: 6px;
-            padding: 12px;
-            border-radius: 20px;
-            border: none;
-            background-color: var(--rojo);
-            color: var(--blanco);
-            font-family: 'Baloo 2', sans-serif;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .modal-comparar-contenido #btn-submit-comparar:hover {
-            background-color: var(--rojo-oscuro);
-        }
-
-        /* Contenedor para las 2 tarjetas lado a lado */
         .contenedor-comparacion {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -647,31 +594,73 @@
             grid-template-columns: 1fr;
         }
 
-        @media (max-width: 750px) {
-            .contenedor-comparacion {
-                grid-template-columns: 1fr;
-            }
+        .banner-seleccion {
+            background-color: var(--amarillo);
+            color: var(--negro);
+            font-weight: 700;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--negro);
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
 
-            .seccion-info,
-            .seccion-debilidades {
+        .banner-seleccion.visible { display: flex; }
+
+        .btn-confirmar-seleccion {
+            display: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--negro);
+            background-color: var(--blanco);
+            color: var(--rojo);
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-confirmar-seleccion.visible { display: inline-block; }
+
+        .btn-confirmar-seleccion:hover {
+            background-color: var(--negro);
+            color: var(--amarillo);
+        }
+
+        .contenedor-comparacion.modo-seleccion .tarjeta {
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .contenedor-comparacion.modo-seleccion .tarjeta:hover {
+            transform: scale(1.015);
+            box-shadow: 0 0 0 4px var(--amarillo);
+        }
+
+        .tarjeta-conservada { box-shadow: 0 0 0 6px var(--amarillo) !important; }
+        .tarjeta-descartada { opacity: 0.35; filter: grayscale(60%); }
+
+        @media (max-width: 750px) {
+            .contenedor-comparacion { grid-template-columns: 1fr; }
+            .seccion-info, .seccion-debilidades, .seccion-movimientos {
                 border-right: none;
                 border-bottom: 2px dashed #ecd6d6;
             }
-
-            .icono-flotante {
-                display: none;
-            }
-
+            .icono-flotante { display: none; }
             h1 {
-                font-size: 40px;
-                -webkit-text-stroke: 2.5px var(--azul-pokemon);
+                font-size: 34px;
+                -webkit-text-stroke: 2px var(--azul-pokemon);
                 text-shadow: 2.5px 2.5px 0 var(--azul-pokemon), 4px 4px 0 #1a3a7a;
             }
-
-            .lente-pokedex {
-                width: 44px;
-                height: 44px;
-            }
+            .lente-pokedex { width: 44px; height: 44px; }
         }
     </style>
 </head>
@@ -698,68 +687,65 @@
         <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
         <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
     </svg>
-    <svg class="icono-flotante" style="top: 22%; left: 6%;" width="48" height="48" viewBox="0 0 60 60">
-        <circle cx="12" cy="14" r="6" fill="#cc0000" />
-        <circle cx="48" cy="14" r="6" fill="#cc0000" />
-        <circle cx="30" cy="35" r="22" fill="#cc0000" />
-        <circle cx="23" cy="32" r="3" fill="#fff8f0" />
-        <circle cx="37" cy="32" r="3" fill="#fff8f0" />
+
+    <svg class="icono-flotante" style="top: 22%; left: 6%;" width="42" height="42" viewBox="0 0 60 60">
+        <path d="M30 4 C22 16 16 22 16 34 C16 46 22 54 30 54 C38 54 44 46 44 34 C44 26 40 22 36 16 C36 24 32 26 30 22 C28 18 30 10 30 4 Z" fill="#cc0000" />
+        <path d="M30 26 C26 32 24 36 24 40 C24 46 27 50 30 50 C33 50 36 46 36 40 C36 36 33 33 31 29 C31 33 29 34 28 32 C27 30 29 27 30 26 Z" fill="#ffcb05" />
     </svg>
-    <svg class="icono-flotante" style="top: 20%; right: 8%;" width="50" height="50" viewBox="0 0 70 70">
-        <circle cx="35" cy="35" r="30" fill="none" stroke="#cc0000" stroke-width="4" />
-        <line x1="5" y1="35" x2="65" y2="35" stroke="#cc0000" stroke-width="4" />
-        <circle cx="35" cy="35" r="8" fill="none" stroke="#cc0000" stroke-width="4" />
+
+    <svg class="icono-flotante" style="top: 20%; right: 8%;" width="46" height="46" viewBox="0 0 60 60">
+        <path d="M30 6 C40 22 48 32 48 42 C48 52 40 58 30 58 C20 58 12 52 12 42 C12 32 20 22 30 6 Z" fill="#222" />
+        <ellipse cx="24" cy="40" rx="5" ry="7" fill="#fff8f0" opacity="0.6" />
     </svg>
+
     <svg class="icono-flotante" style="top: 32%; right: 8%;" width="46" height="46" viewBox="0 0 60 60">
-        <circle cx="26" cy="30" r="20" fill="#222" />
-        <path d="M44 30 L58 18 L54 34 Z" fill="#222" />
-        <circle cx="20" cy="27" r="3" fill="#fff8f0" />
-        <circle cx="32" cy="27" r="3" fill="#fff8f0" />
+        <path d="M8 52 C8 30 22 10 52 8 C50 38 30 52 8 52 Z" fill="#222" />
+        <path d="M10 50 L48 12" stroke="#fff8f0" stroke-width="2" fill="none" opacity="0.4" />
     </svg>
-    <svg class="icono-flotante" style="top: 45%; left: 3%;" width="42" height="42" viewBox="0 0 60 60">
-        <circle cx="30" cy="30" r="24" fill="#cc0000" />
-        <circle cx="21" cy="26" r="3.5" fill="#fff8f0" />
-        <circle cx="39" cy="26" r="3.5" fill="#fff8f0" />
-        <path d="M20 38 Q30 44 40 38" stroke="#fff8f0" stroke-width="3" fill="none" stroke-linecap="round" />
+
+    <svg class="icono-flotante" style="top: 45%; left: 3%;" width="40" height="40" viewBox="0 0 60 60">
+        <path d="M34 4 L14 32 L26 32 L22 56 L48 24 L34 24 Z" fill="#cc0000" />
     </svg>
+
     <svg class="icono-flotante" style="top: 50%; right: 4%;" width="44" height="44" viewBox="0 0 70 70">
         <circle cx="35" cy="35" r="30" fill="none" stroke="#cc0000" stroke-width="4" />
         <line x1="5" y1="35" x2="65" y2="35" stroke="#cc0000" stroke-width="4" />
         <circle cx="35" cy="35" r="8" fill="none" stroke="#cc0000" stroke-width="4" />
     </svg>
+
     <svg class="icono-flotante" style="top: 60%; left: 16%;" width="26" height="26" viewBox="0 0 34 34">
         <circle cx="17" cy="17" r="15" fill="none" stroke="#cc0000" stroke-width="2.5" />
         <circle cx="17" cy="17" r="4" fill="#cc0000" />
     </svg>
-    <svg class="icono-flotante" style="top: 65%; right: 20%;" width="44" height="44" viewBox="0 0 60 60">
-        <path d="M10 20 L18 5 L22 22 Z" fill="#222" />
-        <path d="M50 20 L42 5 L38 22 Z" fill="#222" />
-        <circle cx="30" cy="34" r="20" fill="#222" />
-        <circle cx="24" cy="32" r="3" fill="#fff8f0" />
-        <circle cx="36" cy="32" r="3" fill="#fff8f0" />
+
+    <svg class="icono-flotante" style="top: 65%; right: 20%;" width="36" height="36" viewBox="0 0 60 60">
+        <path d="M30 4 C22 16 16 22 16 34 C16 46 22 54 30 54 C38 54 44 46 44 34 C44 26 40 22 36 16 C36 24 32 26 30 22 C28 18 30 10 30 4 Z" fill="#222" />
+        <path d="M30 26 C26 32 24 36 24 40 C24 46 27 50 30 50 C33 50 36 46 36 40 C36 36 33 33 31 29 C31 33 29 34 28 32 C27 30 29 27 30 26 Z" fill="#ffcb05" />
     </svg>
+
     <svg class="icono-flotante" style="bottom: 6%; left: 5%;" width="55" height="55" viewBox="0 0 70 70">
         <circle cx="35" cy="35" r="30" fill="none" stroke="#222" stroke-width="4" />
         <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
         <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
     </svg>
-    <svg class="icono-flotante" style="bottom: 10%; right: 6%;" width="42" height="42" viewBox="0 0 60 60">
-        <circle cx="30" cy="30" r="24" fill="#cc0000" />
-        <circle cx="21" cy="26" r="3.5" fill="#fff8f0" />
-        <circle cx="39" cy="26" r="3.5" fill="#fff8f0" />
-        <path d="M20 38 Q30 44 40 38" stroke="#fff8f0" stroke-width="3" fill="none" stroke-linecap="round" />
+
+    <svg class="icono-flotante" style="bottom: 10%; right: 6%;" width="38" height="38" viewBox="0 0 60 60">
+        <path d="M30 6 C40 22 48 32 48 42 C48 52 40 58 30 58 C20 58 12 52 12 42 C12 32 20 22 30 6 Z" fill="#cc0000" />
+        <ellipse cx="24" cy="40" rx="5" ry="7" fill="#fff8f0" opacity="0.6" />
     </svg>
-    <svg class="icono-flotante" style="bottom: 4%; left: 25%;" width="26" height="26" viewBox="0 0 34 34">
-        <path d="M17 2 L21 13 L32 13 L23 20 L27 31 L17 24 L7 31 L11 20 L2 13 L13 13 Z" fill="#cc0000" />
+
+    <svg class="icono-flotante" style="bottom: 4%; left: 25%;" width="26" height="26" viewBox="0 0 60 60">
+        <path d="M34 4 L14 32 L26 32 L22 56 L48 24 L34 24 Z" fill="#222" />
     </svg>
+
     <svg class="icono-flotante" style="bottom: 15%; right: 28%;" width="30" height="30" viewBox="0 0 34 34">
         <circle cx="17" cy="17" r="15" fill="none" stroke="#222" stroke-width="2.5" />
         <circle cx="17" cy="17" r="4" fill="#222" />
     </svg>
-    <svg class="icono-flotante" style="bottom: 2%; right: 15%;" width="40" height="40" viewBox="0 0 70 70">
-        <circle cx="35" cy="35" r="30" fill="none" stroke="#222" stroke-width="4" />
-        <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="4" />
-        <circle cx="35" cy="35" r="8" fill="none" stroke="#222" stroke-width="4" />
+
+    <svg class="icono-flotante" style="bottom: 2%; right: 15%;" width="36" height="36" viewBox="0 0 60 60">
+        <path d="M8 52 C8 30 22 10 52 8 C50 38 30 52 8 52 Z" fill="#222" />
+        <path d="M10 50 L48 12" stroke="#fff8f0" stroke-width="2" fill="none" opacity="0.4" />
     </svg>
 
     <div class="encabezado">
@@ -776,17 +762,20 @@
             <button id="btn-random"><span class="signo-interrogacion">?</span> Aleatorio</button>
             <button id="btn-comparar" disabled>
                 <svg width="18" height="14" viewBox="0 0 40 24" style="vertical-align:-2px; margin-right:4px;">
-                    <text x="0" y="18" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18"
-                        fill="currentColor">VS</text>
-                </svg>Comparar
+                    <text x="0" y="18" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18" fill="currentColor">VS</text>
+                </svg><span id="texto-btn-comparar">Comparar</span>
             </button>
             <button id="btn-reset" disabled>🔄 Reset</button>
         </div>
     </div>
 
-    <div id="resultado">
+    <div id="banner-seleccion" class="banner-seleccion">
+        <span id="texto-banner-seleccion">Ingresa ID / Pokémon o Aleatorio a comparar</span>
+        <button id="btn-confirmar-seleccion" class="btn-confirmar-seleccion">Confirmar selección ✓</button>
     </div>
-    <!-- Ventana emergente: Pokémon no encontrado, con su grito repitiéndose -->
+
+    <div id="resultado"></div>
+
     <div class="modal-overlay" id="modal-no-encontrado">
         <div class="modal-contenido">
             <button class="btn-cerrar-modal" id="btn-cerrar-modal">✕</button>
@@ -803,38 +792,70 @@
     </div>
 
     <script>
-        // Variables globales
         const input = document.getElementById('pokemon-input');
         const button = document.getElementById('btn-buscar');
         const resultado = document.getElementById('resultado');
         const buttonRandom = document.getElementById('btn-random');
         const buttonComparar = document.getElementById('btn-comparar');
+        const textoBtnComparar = document.getElementById('texto-btn-comparar');
         const lucesPokedex = document.getElementById('luces-pokedex');
         const modalNoEncontrado = document.getElementById('modal-no-encontrado');
         const gifNoEncontrado = document.getElementById('gif-no-encontrado');
         const btnCerrarModal = document.getElementById('btn-cerrar-modal');
         const buttonReset = document.getElementById('btn-reset');
+        const bannerSeleccion = document.getElementById('banner-seleccion');
+        const textoBannerSeleccion = document.getElementById('texto-banner-seleccion');
+        const btnConfirmarSeleccion = document.getElementById('btn-confirmar-seleccion');
         let urlGritoActual = "";
         let IdActual = null;
-        let modoComparacion = false;      // ¿estamos esperando el 2do Pokémon?
-        let datosPokemon1 = null;         // guarda TODO el objeto que regresa obtenerDatosPokemon del 1er Pokémon
-        let intervaloSincronizado = null; // para sincronizar animaciones si ambos son legendarios (lo usamos más adelante)
+        let modoComparacion = false;
+        let datosPokemon1 = null;
+        let intervaloSincronizado = null;
         let ultimoIdNoEncontrado = null;
         let intervaloSonidoModal = null;
-        let datosActuales = null; // guarda los datos completos del Pokémon que está en pantalla ahora mismo
-
+        let datosActuales = null;
+        let datosComparacion1 = null;
+        let datosComparacion2 = null;
+        let esperandoSeleccionTarjeta = false;
+        let candidatoEsPrimera = null;
 
         const modalBuscando = document.getElementById('modal-buscando');
-        // Funciones para mostrar y ocultar la ventana emergente de "Buscando Pokémon"
-        function mostrarModalBuscando() {
-            modalBuscando.style.display = "flex";
+        function mostrarModalBuscando() { modalBuscando.style.display = "flex"; }
+        function ocultarModalBuscando() { modalBuscando.style.display = "none"; }
+
+        // Pone el botón "Comparar" en su estado activo: rojo, texto "Cancelar", clickeable
+        function activarModoComparacionUI() {
+            buttonComparar.classList.add('activo');
+            buttonComparar.disabled = false;
+            textoBtnComparar.textContent = "Cancelar";
         }
 
-        function ocultarModalBuscando() {
-            modalBuscando.style.display = "none";
+        // Regresa el botón a su estado normal: color original, texto "Comparar"
+        function desactivarModoComparacionUI() {
+            buttonComparar.classList.remove('activo');
+            buttonComparar.disabled = false;
+            textoBtnComparar.textContent = "Comparar";
         }
 
-        // Traducciones de tipos al español
+        // Cancela el modo comparación en cualquier punto del flujo (esperando 1er o 2do Pokémon, o eligiendo tarjeta)
+        function cancelarModoComparacion() {
+            modoComparacion = false;
+            esperandoSeleccionTarjeta = false;
+            candidatoEsPrimera = null;
+            bannerSeleccion.classList.remove('visible');
+            btnConfirmarSeleccion.classList.remove('visible');
+            desactivarModoComparacionUI();
+
+            const contenedor = document.querySelector('.contenedor-comparacion');
+            if (contenedor) {
+                contenedor.classList.remove('modo-seleccion');
+                contenedor.querySelectorAll('.tarjeta').forEach(function (tarjeta) {
+                    tarjeta.classList.remove('tarjeta-conservada', 'tarjeta-descartada');
+                });
+            }
+            input.value = "";
+        }
+
         const tiposEnEspanol = {
             normal: "Normal", fire: "Fuego", water: "Agua", electric: "Eléctrico",
             grass: "Planta", ice: "Hielo", fighting: "Lucha", poison: "Veneno",
@@ -843,7 +864,11 @@
             steel: "Acero", fairy: "Hada"
         };
 
-        // Colores de fondo por tipo
+        const statsEnEspanol = {
+            hp: "PS", attack: "Ataque", defense: "Defensa",
+            "special-attack": "At. Especial", "special-defense": "Def. Especial", speed: "Velocidad"
+        };
+
         const coloresPorTipo = {
             normal: "#a8a878", fire: "#e8620f", water: "#4287f5", electric: "#e8c000",
             grass: "#4caf50", ice: "#5cd0d0", fighting: "#c03028", poison: "#a040a0",
@@ -852,7 +877,6 @@
             steel: "#7d7d99", fairy: "#e57ea0"
         };
 
-        // Muestra la ventana emergente con un Pokémon animado aleatorio y su grito repitiéndose cada 5s
         async function mostrarModalNoEncontrado(mensaje) {
             document.getElementById('mensaje-no-encontrado').textContent = mensaje || "¡Pokémon no encontrado!";
             let idAleatorio;
@@ -865,27 +889,20 @@
             gifNoEncontrado.src = urlGif;
             modalNoEncontrado.style.display = "flex";
 
-            // Intentamos reproducir el grito del Pokémon, pero si falla, la ventana sigue funcionando igual
             try {
                 const respuestaModal = await fetch(`https://pokeapi.co/api/v2/pokemon/${idAleatorio}`);
                 const dataModal = await respuestaModal.json();
                 const urlGritoModal = dataModal.cries.latest;
-
                 const sonidoModal = new Audio(urlGritoModal);
                 sonidoModal.play();
-
-                if (intervaloSonidoModal) {
-                    clearInterval(intervaloSonidoModal);
-                }
+                if (intervaloSonidoModal) clearInterval(intervaloSonidoModal);
                 intervaloSonidoModal = setInterval(function () {
                     const sonidoRepetido = new Audio(urlGritoModal);
                     sonidoRepetido.play();
                 }, 5000);
-            } catch (error) {
-                // si falla el sonido, la ventana sigue funcionando igual, solo sin audio
-            }
+            } catch (error) {}
         }
-        // Función para cerrar la ventana emergente y detener el sonido
+
         function cerrarModalNoEncontrado() {
             modalNoEncontrado.style.display = "none";
             lucesPokedex.classList.remove("estado-error");
@@ -894,56 +911,37 @@
                 intervaloSonidoModal = null;
             }
         }
-        // Agregamos el evento de clic al botón de cerrar la ventana emergente
-        btnCerrarModal.addEventListener('click', cerrarModalNoEncontrado);
 
+        btnCerrarModal.addEventListener('click', cerrarModalNoEncontrado);
         modalNoEncontrado.addEventListener('click', function (event) {
-            if (event.target === modalNoEncontrado) {
-                cerrarModalNoEncontrado();
-            }
+            if (event.target === modalNoEncontrado) cerrarModalNoEncontrado();
         });
 
-        // Función recursiva para buscar un Pokémon en la cadena de evolución
         function buscarEnCadena(nodo, nombreBuscado) {
-            if (nodo.species.name === nombreBuscado) {
-                return nodo;
-            }
+            if (nodo.species.name === nombreBuscado) return nodo;
             for (const hijo of nodo.evolves_to) {
                 const encontrado = buscarEnCadena(hijo, nombreBuscado);
-                if (encontrado) {
-                    return encontrado;
-                }
+                if (encontrado) return encontrado;
             }
             return null;
         }
-        // Función para igualar las alturas de las secciones de información, debilidades y movimientos en la comparación
-        function igualarAlturasComparacion() {
-            const selectores = ['.seccion-info', '.seccion-debilidades', '.seccion-movimientos'];
 
+        function igualarAlturasComparacion() {
+            const selectores = ['.seccion-info', '.seccion-debilidades', '.seccion-movimientos', '.seccion-stats'];
             selectores.forEach(function (selector) {
                 const cajas = document.querySelectorAll('.contenedor-comparacion ' + selector);
                 if (cajas.length < 2) return;
-
                 cajas.forEach(function (caja) { caja.style.minHeight = "auto"; });
-
                 let alturaMaxima = 0;
                 cajas.forEach(function (caja) {
-                    if (caja.offsetHeight > alturaMaxima) {
-                        alturaMaxima = caja.offsetHeight;
-                    }
+                    if (caja.offsetHeight > alturaMaxima) alturaMaxima = caja.offsetHeight;
                 });
-
-                cajas.forEach(function (caja) {
-                    caja.style.minHeight = alturaMaxima + "px";
-                });
+                cajas.forEach(function (caja) { caja.style.minHeight = alturaMaxima + "px"; });
             });
         }
 
-        // Función principal para obtener los datos del Pokémon y mostrarlos en la tarjeta
         async function obtenerDatosPokemon(valor) {
             const pokemonName = valor;
-
-            // Intentamos obtener los datos del Pokémon, y si falla, mostramos la ventana emergente
             try {
                 const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
                 const data = await respuesta.json();
@@ -951,10 +949,16 @@
                 const respuestaEspecie = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`);
                 const dataEspecie = await respuestaEspecie.json();
 
-                const iconoEstrella = "<svg class='estrella-legendaria' viewBox='0 0 24 24'><path d='M12 2 L14.9 8.6 L22 9.3 L16.5 14.1 L18.2 21 L12 17.3 L5.8 21 L7.5 14.1 L2 9.3 L9.1 8.6 Z' fill='url(#gradientePlata)' stroke='var(--color-tipo, var(--rojo))' stroke-width='1.2'/></svg>";
+                const iconoEspada = "<svg class='icono-legendario' viewBox='0 0 24 24'>" +
+                    "<path d='M12 0.5 L14.3 3.2 L13.3 14 L10.7 14 L9.7 3.2 Z' fill='url(#gradientePlata)' stroke='var(--color-tipo, var(--rojo))' stroke-width='0.6'/>" +
+                    "<rect x='6.2' y='13.4' width='11.6' height='2.6' rx='0.7' fill='url(#gradientePlata)' stroke='var(--color-tipo, var(--rojo))' stroke-width='0.6'/>" +
+                    "<rect x='10.5' y='16' width='3' height='5.5' rx='0.9' fill='url(#gradientePlata)' stroke='var(--color-tipo, var(--rojo))' stroke-width='0.6'/>" +
+                    "<circle cx='12' cy='22.3' r='1.5' fill='url(#gradientePlata)' stroke='var(--color-tipo, var(--rojo))' stroke-width='0.6'/>" +
+                    "</svg>";
+                const iconoEscudo = "<svg class='icono-legendario' viewBox='0 0 24 24'><path d='M12 1 L21 4.5 L21 11 C21 17 17 21 12 23 C7 21 3 17 3 11 L3 4.5 Z' fill='url(#gradientePlata)' stroke='var(--color-tipo, var(--rojo))' stroke-width='1'/></svg>";
                 const defsGradiente = "<svg width='0' height='0'><defs><linearGradient id='gradientePlata' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#8a8a8a'/><stop offset='40%' stop-color='#f5f5f5'/><stop offset='60%' stop-color='#ffffff'/><stop offset='100%' stop-color='#8a8a8a'/></linearGradient></defs></svg>";
 
-                const mensajeLegendario = dataEspecie.is_legendary ? defsGradiente + "<p class='texto-legendario'>" + iconoEstrella + "Pokémon Legendario" + iconoEstrella + "</p>" : "";
+                const mensajeLegendario = dataEspecie.is_legendary ? defsGradiente + "<p class='texto-legendario'>" + iconoEspada + "Pokémon Legendario" + iconoEscudo + "</p>" : "";
 
                 const respuestaCadena = await fetch(dataEspecie.evolution_chain.url);
                 const dataCadena = await respuestaCadena.json();
@@ -962,7 +966,6 @@
                 const nodoActual = buscarEnCadena(dataCadena.chain, data.name);
                 let piedraFinal = "";
 
-                // Si el Pokémon tiene evoluciones que requieren un ítem, mostramos el ícono del ítem y su nombre
                 if (nodoActual) {
                     for (const hijo of nodoActual.evolves_to) {
                         const detalle = hijo.evolution_details[0];
@@ -977,14 +980,13 @@
                     }
                 }
 
-                // Obtenemos la imagen animada del Pokémon si está disponible, de lo contrario usamos la imagen estática
                 const spriteAnimado = data.sprites.versions["generation-v"]["black-white"].animated.front_default;
                 const imagenFinal = spriteAnimado ? spriteAnimado : data.sprites.front_default;
 
                 const tipoPrincipalIngles = data.types[0].type.name;
                 const colorTipoPrincipal = coloresPorTipo[tipoPrincipalIngles] ? coloresPorTipo[tipoPrincipalIngles] : "#cc0000";
+                let urlIconoTipoPrincipal = "";
 
-                // Creamos las insignias de tipos y debilidades
                 let tiposFinal = "";
                 let debilidadesFinal = "";
                 for (const tipoObj of data.types) {
@@ -995,22 +997,33 @@
                     const nombreTipoEspanol = tiposEnEspanol[nombreTipoIngles] ? tiposEnEspanol[nombreTipoIngles] : nombreTipoIngles;
                     const urlIconoTipo = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/brilliant-diamond-shining-pearl/small/${dataTipo.id}.png`;
 
+                    if (tiposFinal === "") urlIconoTipoPrincipal = urlIconoTipo;
+
                     tiposFinal += "<div class='insignia'><img class='icono-tipo' src='" + urlIconoTipo + "' alt='" + nombreTipoEspanol + "'><span>" + nombreTipoEspanol + "</span></div>";
 
                     let insigniasDebilidad = "";
                     dataTipo.damage_relations.double_damage_from.forEach(function (debilidadObj) {
                         const nombreIngles = debilidadObj.name;
                         const nombreEspanol = tiposEnEspanol[nombreIngles] ? tiposEnEspanol[nombreIngles] : nombreIngles;
-
                         const partesUrl = debilidadObj.url.split("/");
                         const idDebilidad = partesUrl[partesUrl.length - 2];
                         const urlIconoDebilidad = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/brilliant-diamond-shining-pearl/small/${idDebilidad}.png`;
-
                         insigniasDebilidad += "<div class='insignia'><img class='icono-tipo' src='" + urlIconoDebilidad + "' alt='" + nombreEspanol + "'><span>" + nombreEspanol + "</span></div>";
                     });
 
                     debilidadesFinal += "<div class='bloque-debilidad-tipo'><strong>" + nombreTipoEspanol + "</strong><div class='fila-insignias'>" + insigniasDebilidad + "</div></div>";
                 }
+
+                let statsFinal = "";
+                data.stats.forEach(function (statObj) {
+                    const nombreStat = statsEnEspanol[statObj.stat.name] ? statsEnEspanol[statObj.stat.name] : statObj.stat.name;
+                    const valorStat = statObj.base_stat;
+                    const porcentaje = Math.min((valorStat / 255) * 100, 100);
+                    statsFinal += "<div class='fila-stat'>" +
+                        "<div class='etiqueta-stat'><span>" + nombreStat + "</span><span>" + valorStat + "</span></div>" +
+                        "<div class='barra-stat-fondo'><div class='barra-stat-relleno' style='width:" + porcentaje + "%;'></div></div>" +
+                        "</div>";
+                });
 
                 const movimientosPorNivel = data.moves.filter(function (movimientoObj) {
                     return movimientoObj.version_group_details.some(function (detalle) {
@@ -1025,9 +1038,7 @@
                     return { nombre: movimientoObj.move.name, nivel: detalleNivel.level_learned_at };
                 });
 
-                movimientosConNivel.sort(function (a, b) {
-                    return a.nivel - b.nivel;
-                });
+                movimientosConNivel.sort(function (a, b) { return a.nivel - b.nivel; });
 
                 let movimientosFinal = "";
                 movimientosConNivel.forEach(function (movObj) {
@@ -1038,36 +1049,26 @@
                 });
 
                 return {
-                    data,
-                    dataEspecie,
-                    colorTipoPrincipal,
-                    tiposFinal,
-                    debilidadesFinal,
-                    movimientosFinal,
-                    mensajeLegendario,
-                    piedraFinal,
-                    imagenFinal
+                    data, dataEspecie, colorTipoPrincipal, urlIconoTipoPrincipal, tiposFinal,
+                    debilidadesFinal, movimientosFinal, mensajeLegendario, piedraFinal, imagenFinal, statsFinal
                 };
-
             } catch (error) {
                 throw error;
             }
         }
 
         function generarTarjetaHTML(datos, esComparacion) {
-            // "Desempacamos" el objeto que regresa obtenerDatosPokemon,
-            const { data, dataEspecie, colorTipoPrincipal, tiposFinal,
-                debilidadesFinal, movimientosFinal, mensajeLegendario,
-                piedraFinal, imagenFinal } = datos;
+            const { data, dataEspecie, colorTipoPrincipal, urlIconoTipoPrincipal, tiposFinal,
+                debilidadesFinal, movimientosFinal, mensajeLegendario, piedraFinal, imagenFinal, statsFinal } = datos;
 
-            // estas dos SÍ dependen de "datos" y hay que recalcularlas aquí,
             const nombreCapitalizado = data.name.charAt(0).toUpperCase() + data.name.slice(1);
             const claseLegendaria = dataEspecie.is_legendary ? " legendaria" : "";
+            const onloadImagen = esComparacion ? " onload=\"igualarAlturasComparacion()\"" : "";
 
-            return "<div class='tarjeta" + claseLegendaria + "' style='--color-tipo: " + colorTipoPrincipal + ";'>" +
+            return "<div class='tarjeta" + claseLegendaria + "' style='--color-tipo: " + colorTipoPrincipal + "; --textura-tipo: url(" + urlIconoTipoPrincipal + ");'>" +
                 "<div class='seccion-info'>" +
                 "<h2>" + nombreCapitalizado + "</h2>" +
-                "<img src='" + imagenFinal + "' alt='" + data.name + "'>" +
+                "<img src='" + imagenFinal + "' alt='" + data.name + "'" + onloadImagen + ">" +
                 "<div class='estadisticas'>" +
                 "<div class='chip-estadistica'>#" + data.id + "</div>" +
                 "<div class='chip-estadistica'>📏 " + (data.height / 10) + " m</div>" +
@@ -1084,6 +1085,10 @@
                 "<h3>Movimientos</h3>" +
                 "<div class='lista-movimientos'>" + movimientosFinal + "</div>" +
                 "</div>" +
+                "<div class='seccion-stats'>" +
+                "<h4>Estadísticas</h4>" +
+                statsFinal +
+                "</div>" +
                 "<div class='fila-botones'>" +
                 "<button class='btn-grito' data-sonido='" + data.cries.latest + "'>🔊 Escuchar de nuevo</button>" +
                 (esComparacion ? "" : "<button class='btn-anterior'>⬅️ Anterior</button><button class='btn-siguiente'>Siguiente ➡️</button>") +
@@ -1091,7 +1096,6 @@
                 "</div>";
         }
 
-        // Función principal para buscar un Pokémon y mostrar su tarjeta
         async function buscarPokemon(valor) {
             if (!valor || valor.toString().trim() === "") {
                 mostrarModalNoEncontrado("¡Campo vacío! Escribe un nombre o ID.");
@@ -1122,7 +1126,6 @@
                 input.value = "";
                 lucesPokedex.classList.remove("estado-buscando");
                 datosActuales = datos;
-
             } catch (error) {
                 ocultarModalBuscando();
                 resultado.innerHTML = "";
@@ -1131,29 +1134,27 @@
                 buttonReset.classList.add('visible');
                 buttonReset.disabled = false;
                 mostrarModalNoEncontrado();
-
             }
         }
 
-        // Función para comparar dos Pokémon y mostrar sus tarjetas lado a lado
         async function compararPokemon(valor) {
             mostrarModalBuscando();
             lucesPokedex.classList.remove("estado-error");
             lucesPokedex.classList.add("estado-buscando");
 
             try {
-                // 1) Trae los datos del 2do Pokémon
                 const datos2 = await obtenerDatosPokemon(valor);
+                datosComparacion1 = datosPokemon1;
+                datosComparacion2 = datos2;
 
-                // 2) Genera el HTML de ambas tarjetas
                 const html1 = generarTarjetaHTML(datosPokemon1, true);
                 const html2 = generarTarjetaHTML(datos2, true);
                 ocultarModalBuscando();
-                // 3) Pinta las 2 juntas
                 resultado.innerHTML = "<div class='contenedor-comparacion'>" + html1 + html2 + "</div>";
                 igualarAlturasComparacion();
                 const sonido1 = new Audio(datosPokemon1.data.cries.latest);
                 sonido1.play();
+                bannerSeleccion.classList.remove('visible');
 
                 setTimeout(function () {
                     const sonido2 = new Audio(datos2.data.cries.latest);
@@ -1161,10 +1162,8 @@
                 }, 2000);
 
                 modoComparacion = false;
-                buttonComparar.classList.remove('activo');
-                buttonComparar.disabled = false;
+                desactivarModoComparacionUI();
                 lucesPokedex.classList.remove("estado-buscando");
-
             } catch (error) {
                 ocultarModalBuscando();
                 lucesPokedex.classList.remove("estado-buscando");
@@ -1173,16 +1172,11 @@
                 buttonReset.disabled = false;
                 mostrarModalNoEncontrado();
             }
-
         }
 
-        button.addEventListener('click', function () {
-            buscarPokemon(input.value);
-        });
+        button.addEventListener('click', function () { buscarPokemon(input.value); });
         input.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                buscarPokemon(input.value);
-            }
+            if (event.key === "Enter") buscarPokemon(input.value);
         });
         buttonRandom.addEventListener('click', function () {
             const randomId = Math.floor(Math.random() * 1010) + 1;
@@ -1190,10 +1184,43 @@
         });
 
         buttonComparar.addEventListener('click', function () {
-            datosPokemon1 = datosActuales;
+            // Si el botón ya está activo (rojo), este clic significa "Cancelar"
+            if (buttonComparar.classList.contains('activo')) {
+                cancelarModoComparacion();
+                return;
+            }
+
+            if (datosComparacion1 && datosComparacion2) {
+                esperandoSeleccionTarjeta = true;
+                candidatoEsPrimera = null;
+                activarModoComparacionUI();
+                textoBannerSeleccion.textContent = "¿Qué Pokémon quieres comparar? También puedes usar Aleatorio 🎲";
+                btnConfirmarSeleccion.classList.remove('visible');
+                bannerSeleccion.classList.add('visible');
+                document.querySelector('.contenedor-comparacion').classList.add('modo-seleccion');
+            } else {
+                datosPokemon1 = datosActuales;
+                modoComparacion = true;
+                activarModoComparacionUI();
+                textoBannerSeleccion.textContent = "Ingresa ID / Pokémon o Aleatorio a comparar";
+                btnConfirmarSeleccion.classList.remove('visible');
+                bannerSeleccion.classList.add('visible');
+                input.value = "";
+            }
+        });
+
+        btnConfirmarSeleccion.addEventListener('click', function () {
+            if (candidatoEsPrimera === null) return;
+
+            datosPokemon1 = candidatoEsPrimera ? datosComparacion1 : datosComparacion2;
             modoComparacion = true;
-            buttonComparar.classList.add('activo');
-            buttonComparar.disabled = true;
+            esperandoSeleccionTarjeta = false;
+
+            const contenedor = document.querySelector('.contenedor-comparacion');
+            if (contenedor) contenedor.classList.remove('modo-seleccion');
+
+            btnConfirmarSeleccion.classList.remove('visible');
+            textoBannerSeleccion.textContent = "Escribe el ID / Pokémon o usa Aleatorio para el nuevo retador";
             input.value = "";
         });
 
@@ -1204,11 +1231,18 @@
             IdActual = null;
             datosActuales = null;
             datosPokemon1 = null;
+            datosComparacion1 = null;
+            datosComparacion2 = null;
             modoComparacion = false;
-            buttonComparar.classList.remove('activo', 'visible');
+            esperandoSeleccionTarjeta = false;
+            candidatoEsPrimera = null;
+            desactivarModoComparacionUI();
+            buttonComparar.classList.remove('visible');
             buttonComparar.disabled = true;
             buttonReset.classList.remove('visible');
             buttonReset.disabled = true;
+            btnConfirmarSeleccion.classList.remove('visible');
+            bannerSeleccion.classList.remove('visible');
             lucesPokedex.classList.remove("estado-buscando", "estado-error");
             lucesPokedex.classList.add("estado-reset");
             setTimeout(function () {
@@ -1216,17 +1250,36 @@
             }, 1000);
         });
 
-
         resultado.addEventListener('click', function (event) {
             if (event.target.classList.contains('btn-grito')) {
                 const sonido = new Audio(event.target.dataset.sonido);
                 sonido.play();
             }
-            if (event.target.classList.contains('btn-anterior')) {
-                buscarPokemon(IdActual - 1);
-            }
-            if (event.target.classList.contains('btn-siguiente')) {
-                buscarPokemon(IdActual + 1);
+            if (event.target.classList.contains('btn-anterior')) buscarPokemon(IdActual - 1);
+            if (event.target.classList.contains('btn-siguiente')) buscarPokemon(IdActual + 1);
+
+            if (esperandoSeleccionTarjeta) {
+                const tarjetaClickeada = event.target.closest('.tarjeta');
+                if (tarjetaClickeada) {
+                    const contenedor = tarjetaClickeada.parentElement;
+                    const tarjeta1 = contenedor.children[0];
+                    const tarjeta2 = contenedor.children[1];
+                    const esLaPrimera = tarjetaClickeada === tarjeta1;
+
+                    tarjeta1.classList.remove('tarjeta-conservada', 'tarjeta-descartada');
+                    tarjeta2.classList.remove('tarjeta-conservada', 'tarjeta-descartada');
+
+                    if (esLaPrimera) {
+                        tarjeta1.classList.add('tarjeta-conservada');
+                        tarjeta2.classList.add('tarjeta-descartada');
+                    } else {
+                        tarjeta2.classList.add('tarjeta-conservada');
+                        tarjeta1.classList.add('tarjeta-descartada');
+                    }
+
+                    candidatoEsPrimera = esLaPrimera;
+                    btnConfirmarSeleccion.classList.add('visible');
+                }
             }
         });
     </script>
