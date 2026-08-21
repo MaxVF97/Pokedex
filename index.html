@@ -121,6 +121,27 @@
             animation: parpadeo-led 0.5s ease-in-out 2;
         }
 
+        /* Mientras suena un grito, cada LED parpadea con su propio color
+           (no se sobreescribe el color, solo se agrega la animación).
+           Cada uno arranca en un momento distinto para que se note un
+           efecto de "cascada" (rojo -> amarillo -> verde), en vez de
+           que los 3 parpadeen exactamente igual y a la vez. */
+        .luces-pokedex.estado-sonido .luz {
+            animation: parpadeo-led 0.6s ease-in-out infinite;
+        }
+
+        .luces-pokedex.estado-sonido .luz-roja {
+            animation-delay: 0s;
+        }
+
+        .luces-pokedex.estado-sonido .luz-amarilla {
+            animation-delay: 0.2s;
+        }
+
+        .luces-pokedex.estado-sonido .luz-verde {
+            animation-delay: 0.4s;
+        }
+
         @keyframes parpadeo-led {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.2; }
@@ -614,6 +635,21 @@
             margin: 0 0 14px 0;
         }
 
+        .modal-lleno-contenido {
+            border-color: var(--amarillo);
+        }
+
+        .modal-lleno-contenido p {
+            color: #b8860b;
+            font-size: 16px;
+        }
+
+        .icono-lleno {
+            font-size: 52px;
+            margin-bottom: 10px;
+            animation: parpadeo-estrella 1s ease-in-out infinite;
+        }
+
         #lista-favoritos {
             max-height: 320px;
             overflow-y: auto;
@@ -911,6 +947,13 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="modal-favoritos-lleno">
+        <div class="modal-contenido modal-lleno-contenido">
+            <div class="icono-lleno">⭐</div>
+            <p>¡Ya tienes 20 Pokémon en tu equipo de favoritos!<br>Quita alguno antes de agregar otro.</p>
+        </div>
+    </div>
+
     <script>
         const input = document.getElementById('pokemon-input');
         const button = document.getElementById('btn-buscar');
@@ -930,6 +973,7 @@
         const modalFavoritos = document.getElementById('modal-favoritos');
         const btnCerrarModalFavoritos = document.getElementById('btn-cerrar-modal-favoritos');
         const listaFavoritosDiv = document.getElementById('lista-favoritos');
+        const modalFavoritosLleno = document.getElementById('modal-favoritos-lleno');
 
         let urlGritoActual = "";
         let IdActual = null;
@@ -943,6 +987,43 @@
         let datosComparacion2 = null;
         let esperandoSeleccionTarjeta = false;
         let candidatoEsPrimera = null;
+
+        // ==== SISTEMA CENTRALIZADO DE SONIDOS ====
+        // Guarda cada Audio que se reproduce y cada setTimeout pendiente de la
+        // secuencia de comparación, para poder cortarlos TODOS de golpe en
+        // cualquier momento (evita sonidos duplicados o que sigan sonando
+        // después de que el usuario ya hizo otra cosa)
+        let audiosActivos = [];
+        let timeoutsSonidoComparacion = [];
+
+        function reproducirSonido(url) {
+            const audio = new Audio(url);
+            audiosActivos.push(audio);
+            audio.addEventListener('ended', function () {
+                audiosActivos = audiosActivos.filter(function (a) { return a !== audio; });
+            });
+            audio.play();
+            return audio;
+        }
+
+        function detenerTodosLosSonidos() {
+            audiosActivos.forEach(function (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+            audiosActivos = [];
+
+            timeoutsSonidoComparacion.forEach(function (id) { clearTimeout(id); });
+            timeoutsSonidoComparacion = [];
+
+            if (intervaloSonidoModal) {
+                clearInterval(intervaloSonidoModal);
+                intervaloSonidoModal = null;
+            }
+
+            lucesPokedex.classList.remove('estado-sonido');
+        }
+        // ==== FIN SISTEMA DE SONIDOS ====
 
         let favoritos = JSON.parse(localStorage.getItem('pokedexFavoritos') || '[]');
 
@@ -997,13 +1078,24 @@
             return favoritos.some(function (f) { return f.id === id; });
         }
 
+        function mostrarModalFavoritosLleno() {
+            modalFavoritosLleno.style.display = "flex";
+            setTimeout(function () {
+                modalFavoritosLleno.style.display = "none";
+            }, 2500);
+        }
+
+        modalFavoritosLleno.addEventListener('click', function () {
+            modalFavoritosLleno.style.display = "none";
+        });
+
         function toggleFavorito(id, nombre) {
             const indice = favoritos.findIndex(function (f) { return f.id === id; });
             if (indice >= 0) {
                 favoritos.splice(indice, 1);
             } else {
-                if (favoritos.length >= 10) {
-                    alert("Ya tienes 10 Pokémon guardados en favoritos. Quita alguno antes de agregar otro.");
+                if (favoritos.length >= 20) {
+                    mostrarModalFavoritosLleno();
                     return;
                 }
                 favoritos.push({ id: id, nombre: nombre });
@@ -1103,12 +1195,10 @@
                 const respuestaModal = await fetch(`https://pokeapi.co/api/v2/pokemon/${idAleatorio}`);
                 const dataModal = await respuestaModal.json();
                 const urlGritoModal = dataModal.cries.latest;
-                const sonidoModal = new Audio(urlGritoModal);
-                sonidoModal.play();
+                reproducirSonido(urlGritoModal);
                 if (intervaloSonidoModal) clearInterval(intervaloSonidoModal);
                 intervaloSonidoModal = setInterval(function () {
-                    const sonidoRepetido = new Audio(urlGritoModal);
-                    sonidoRepetido.play();
+                    reproducirSonido(urlGritoModal);
                 }, 5000);
             } catch (error) {}
         }
@@ -1329,8 +1419,7 @@
                 const htmlTarjeta = generarTarjetaHTML(datos, false);
                 ocultarModalBuscando();
                 resultado.innerHTML = htmlTarjeta;
-                const sonido = new Audio(datos.data.cries.latest);
-                sonido.play();
+                reproducirSonido(datos.data.cries.latest);
                 urlGritoActual = datos.data.cries.latest;
                 IdActual = datos.data.id;
                 buttonComparar.classList.add('visible');
@@ -1340,6 +1429,13 @@
                 input.value = "";
                 lucesPokedex.classList.remove("estado-buscando");
                 datosActuales = datos;
+
+                // Cualquier búsqueda individual (normal, aleatoria, o desde favoritos)
+                // invalida una comparación anterior: ya no hay 2 tarjetas en pantalla,
+                // así que btnComparar debe iniciar una comparación NUEVA, no asumir que
+                // ya existe una previa para elegir entre 2
+                datosComparacion1 = null;
+                datosComparacion2 = null;
             } catch (error) {
                 ocultarModalBuscando();
                 resultado.innerHTML = "";
@@ -1369,20 +1465,19 @@
                 bannerSeleccion.classList.remove('visible');
 
                 // 1) Sonido inmediato del Pokémon recién agregado (confirma la selección)
-                const sonidoNuevo = new Audio(datos2.data.cries.latest);
-                sonidoNuevo.play();
+                reproducirSonido(datos2.data.cries.latest);
 
                 // 2) 5s después: grito del Pokémon 1
-                setTimeout(function () {
-                    const sonido1 = new Audio(datosPokemon1.data.cries.latest);
-                    sonido1.play();
+                const idTimeout1 = setTimeout(function () {
+                    reproducirSonido(datosPokemon1.data.cries.latest);
 
                     // 3) 2s después de ese: grito del Pokémon 2 otra vez, y termina la secuencia
-                    setTimeout(function () {
-                        const sonido2 = new Audio(datos2.data.cries.latest);
-                        sonido2.play();
+                    const idTimeout2 = setTimeout(function () {
+                        reproducirSonido(datos2.data.cries.latest);
                     }, 2000);
+                    timeoutsSonidoComparacion.push(idTimeout2);
                 }, 5000);
+                timeoutsSonidoComparacion.push(idTimeout1);
 
                 modoComparacion = false;
                 desactivarModoComparacionUI();
@@ -1419,7 +1514,17 @@
                 textoBannerSeleccion.textContent = "¿Qué Pokémon quieres comparar? También puedes usar Aleatorio 🎲";
                 btnConfirmarSeleccion.classList.remove('visible');
                 bannerSeleccion.classList.add('visible');
-                document.querySelector('.contenedor-comparacion').classList.add('modo-seleccion');
+
+                // Limpia por completo el estado visual de la ronda anterior
+                // (si no, la tarjeta descartada la vez pasada se queda oculta para siempre)
+                const contenedorPrevio = document.querySelector('.contenedor-comparacion');
+                if (contenedorPrevio) {
+                    contenedorPrevio.classList.remove('seleccion-hecha');
+                    contenedorPrevio.querySelectorAll('.tarjeta').forEach(function (tarjeta) {
+                        tarjeta.classList.remove('tarjeta-conservada', 'tarjeta-descartada', 'desvaneciendo', 'tarjeta-oculta');
+                    });
+                    contenedorPrevio.classList.add('modo-seleccion');
+                }
             } else {
                 datosPokemon1 = datosActuales;
                 modoComparacion = true;
@@ -1488,8 +1593,11 @@
 
         resultado.addEventListener('click', function (event) {
             if (event.target.classList.contains('btn-grito')) {
-                const sonido = new Audio(event.target.dataset.sonido);
-                sonido.play();
+                const audioGrito = reproducirSonido(event.target.dataset.sonido);
+                lucesPokedex.classList.add('estado-sonido');
+                audioGrito.addEventListener('ended', function () {
+                    lucesPokedex.classList.remove('estado-sonido');
+                });
             }
             if (event.target.classList.contains('btn-anterior')) buscarPokemon(IdActual - 1);
             if (event.target.classList.contains('btn-siguiente')) buscarPokemon(IdActual + 1);
@@ -1526,6 +1634,18 @@
                 }
             }
         });
+
+        // Cualquier clic en CUALQUIER parte de la página corta de inmediato todos
+        // los sonidos activos (y cancela los pendientes de la secuencia de comparación).
+        // Se usa fase de "captura" (tercer argumento true) para que esto se ejecute
+        // ANTES que el manejador de clic específico del botón que se haya presionado --
+        // así, si ese mismo clic va a reproducir un sonido nuevo, primero se corta
+        // el anterior y luego se reproduce el nuevo, sin que se empalmen.
+        document.addEventListener('click', function (event) {
+            // La estrella de favoritos no debe cortar el sonido que esté sonando
+            if (event.target.closest && event.target.closest('.btn-favorito')) return;
+            detenerTodosLosSonidos();
+        }, true);
     </script>
 </body>
 
