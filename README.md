@@ -82,5 +82,7 @@ Construido con **HTML, CSS y JavaScript puro**, sin frameworks ni librerías. Co
 **Modo comparación LEGENDARIO!**
 ![Modo comparación LEGENDARIO](preview-comparacion-legendario.jpeg)
 
+**Favoritos**
+![Favoritos](preview-favoritos.jpeg)
 ---
 Proyecto hecho como parte de mi aprendizaje de desarrollo web front-end.
