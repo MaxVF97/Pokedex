@@ -7,34 +7,44 @@ Buscador de Pokémon con datos en tiempo real y diseño inspirado en un disposit
 ## ✨ Funcionalidades
 - 🔍 Búsqueda por nombre o número, con Enter o botón
 - 🎲 Botón de Pokémon aleatorio
-- ⚔️ **Modo comparación**: busca dos Pokémon y muestra sus tarjetas lado a lado, con:
-  - Reproducción secuencial de sus gritos (con diferencia de 2 segundos entre uno y otro)
-  - Sincronización automática de las animaciones si ambos son legendarios
-  - Alturas de cada sección igualadas entre ambas tarjetas para una comparación visual prolija
-- ⚔️ **Modo comparación mejorado**: al re-comparar con una tarjeta ya en
-  pantalla, elige cuál conservar con clic + confirmación; botón dinámico
-  que cambia a "Cancelar" para salir del modo comparación en cualquier
-  momento
-- 📊 Estadísticas base (HP, Ataque, Defensa, Ataque/Defensa Especial,
-  Velocidad) con barras de progreso, con efecto de brillo pulsante en
-  Pokémon legendarios
-- 🎨 Fondo temático por tipo en cada sección de la tarjeta, generado con
-  los íconos de tipo de la propia API
-
-- 🔊 Grito del Pokémon reproducido automáticamente, con botón para repetirlo
+- ⭐ **Favoritos**: guarda hasta 10 Pokémon con un clic en la estrella de
+  cada tarjeta; accede a ellos desde el botón "Favoritos" para verlos
+  de nuevo o quitarlos, persistiendo entre sesiones
+- ⚔️ **Modo comparación**: busca dos Pokémon y muestra sus tarjetas lado
+  a lado, con:
+  - Reproducción secuencial de sus gritos (2s de diferencia)
+  - Sincronización automática de animaciones si ambos son legendarios
+  - Alturas de cada sección igualadas entre ambas tarjetas
+  - Al re-comparar, elige con un clic cuál tarjeta conservar —la
+    elección es reversible hasta confirmarla, momento en que la
+    descartada se desvanece gradualmente
+  - Botón dinámico "Comparar" / "Cancelar" para entrar o salir del
+    modo comparación en cualquier momento
+- 🔊 Grito del Pokémon reproducido automáticamente, con botón para
+  repetirlo (independiente por tarjeta, incluso en modo comparación)
 - 🏷️ Tipo(s) del Pokémon, con ícono e identificación en español
-- ⚔️ Debilidades por tipo, calculadas consultando la API en tiempo real, con íconos
-- 📈 Lista de movimientos que aprende subiendo de nivel, ordenados, con scroll propio
-- 💎 Piedra evolutiva (si aplica), con su ícono correspondiente, en cualquier etapa de la cadena evolutiva
-- ⭐ Aviso especial si el Pokémon es legendario, con efectos visuales animados (marco, texto y estrellas)
-- ⬅️➡️ Navegación anterior/siguiente dentro de la Pokédex (en modo búsqueda individual)
-- 🔄 Botón de reinicio para limpiar la búsqueda y el estado de comparación en un solo clic
-- 🎨 Color de la tarjeta y de los botones cambia dinámicamente según el tipo principal del Pokémon
-- 💡 Estados visuales del dispositivo: LEDs y ventanas emergentes distintas para "buscando", "no encontrado" y "reinicio"
-- 📱 Diseño responsivo: se adapta a computadora, tablet y celular
-- 🚫 Manejo de errores si el nombre no existe o el campo está vacío, con mensajes diferenciados
+- ⚔️ Debilidades por tipo, calculadas consultando la API en tiempo
+  real, con íconos
+- 📈 Lista de movimientos que aprende subiendo de nivel, ordenados,
+  con scroll propio
+- 📊 Estadísticas base (PS, Ataque, Defensa, Ataque/Defensa Especial,
+  Velocidad) con barras de progreso; brillo pulsante en legendarios
+- 💎 Piedra evolutiva (si aplica), con su ícono, en cualquier etapa de
+  la cadena evolutiva
+- ⭐ Aviso especial si el Pokémon es legendario, con marco, texto y
+  estadísticas animadas
+- ⬅️➡️ Navegación anterior/siguiente (en búsqueda individual)
+- 🔄 Botón de reinicio para limpiar la búsqueda y el estado en un clic
+- 🎨 Color de cada tarjeta y fondo temático por tipo, generados
+  dinámicamente con los recursos de la propia API
+- 💡 Estados visuales del dispositivo: LEDs con colores diferenciados
+  (azul buscando, rojo error, verde reset) y ventanas emergentes para
+  cada situación
+- 📱 Diseño responsivo: se adapta a computadora, tablet y celular, en
+  cualquier orientación
+- 🚫 Manejo de errores si el nombre no existe o el campo está vacío,
+  con mensajes diferenciados
 - 🔤 Nombre siempre capitalizado, sin importar cómo se escriba
-
 ## 🛠️ Tecnologías
 Construido con **HTML, CSS y JavaScript puro**, sin frameworks ni librerías. Consume dos APIs públicas: la [PokéAPI](https://pokeapi.co/) para datos de Pokémon, tipos, especies e ítems, y el repositorio open-source [PokeAPI/sprites](https://github.com/PokeAPI/sprites) para íconos de tipo, ítems y sprites animados.
 
