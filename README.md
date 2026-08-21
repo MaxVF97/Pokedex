@@ -45,6 +45,7 @@ Buscador de Pokémon con datos en tiempo real y diseño inspirado en un disposit
 - 🚫 Manejo de errores si el nombre no existe o el campo está vacío,
   con mensajes diferenciados
 - 🔤 Nombre siempre capitalizado, sin importar cómo se escriba
+- Secuencia de sonidos: al agregar el 2do Pokémon, suena su grito de inmediato; 5s después suena el 1ro, y 2s más tarde el 2do otra vez, para escuchar bien ambos gritos antes de decidir
 ## 🛠️ Tecnologías
 Construido con **HTML, CSS y JavaScript puro**, sin frameworks ni librerías. Consume dos APIs públicas: la [PokéAPI](https://pokeapi.co/) para datos de Pokémon, tipos, especies e ítems, y el repositorio open-source [PokeAPI/sprites](https://github.com/PokeAPI/sprites) para íconos de tipo, ítems y sprites animados.
 
